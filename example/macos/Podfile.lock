@@ -1,0 +1,22 @@
+PODS:
+  - FlutterMacOS (1.0.0)
+  - responsive_table (0.0.1):
+    - FlutterMacOS
+
+DEPENDENCIES:
+  - FlutterMacOS (from `Flutter/ephemeral/.symlinks/flutter/darwin-x64`)
+  - responsive_table (from `Flutter/ephemeral/.symlinks/plugins/responsive_table/macos`)
+
+EXTERNAL SOURCES:
+  FlutterMacOS:
+    :path: Flutter/ephemeral/.symlinks/flutter/darwin-x64
+  responsive_table:
+    :path: Flutter/ephemeral/.symlinks/plugins/responsive_table/macos
+
+SPEC CHECKSUMS:
+  FlutterMacOS: 15bea8a44d2fa024068daa0140371c020b4b6ff9
+  responsive_table: afa1b40c51641f4c5600880b62fdb5d167ccec35
+
+PODFILE CHECKSUM: d8ba9b3e9e93c62c74a660b46c6fcb09f03991a7
+
+COCOAPODS: 1.8.4

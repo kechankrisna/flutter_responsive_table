@@ -19,6 +19,7 @@ class ResponsiveDatatable extends StatefulWidget {
   final BoxConstraints constraints;
   final String sortColumn;
   final bool sortAscending;
+  final bool isLoading;
 
   const ResponsiveDatatable({
     Key key,
@@ -38,6 +39,7 @@ class ResponsiveDatatable extends StatefulWidget {
     this.constraints,
     this.sortColumn,
     this.sortAscending,
+    this.isLoading: false,
   }) : super(key: key);
   @override
   _ResponsiveDatatableState createState() => _ResponsiveDatatableState();
@@ -135,6 +137,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                                     })
                               ],
                             ),
+                          if (this.widget.isLoading) LinearProgressIndicator(),
                           ...this.widget.source.map((data) {
                             return InkWell(
                               onTap: () {
@@ -310,6 +313,9 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                       ],
                     ),
                   ),
+
+                if (this.widget.isLoading)
+                  LinearProgressIndicator(),
 
                 // data
                 if (this.widget.source != null && this.widget.source.isNotEmpty)

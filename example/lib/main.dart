@@ -127,6 +127,7 @@ class _DataPageState extends State<DataPage> {
 
   String _sortColumn;
   bool _sortAscending = true;
+  bool _isLoading = true;
 
   List<Map<String, dynamic>> _generateData({int n: 100}) {
     final List source = List.filled(n, Random.secure());
@@ -189,6 +190,7 @@ class _DataPageState extends State<DataPage> {
       ),
       body: ResponsiveDatatable(
         // constraints: BoxConstraints(maxHeight: 450),
+        isLoading: _isLoading,
         title: !_isSearch
             ? RaisedButton.icon(
                 onPressed: () {},
@@ -196,6 +198,7 @@ class _DataPageState extends State<DataPage> {
                 label: Text("ADD CATEGORY"))
             : null,
         actions: [
+          
           if (_isSearch)
             Expanded(
                 child: TextField(
