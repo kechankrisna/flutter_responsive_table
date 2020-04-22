@@ -1,6 +1,6 @@
 name: responsive_table
-description: A new flutter plugin project.
-version: 0.0.1
+description: Responsive Datatabe 
+version: 0.1.0
 homepage: https://github.com/kechankrisna/flutter_responsive_table
 
 environment:
