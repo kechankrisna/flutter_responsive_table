@@ -1,6 +1,6 @@
 # responsive_table
 
-Responsive Datatabe 
+Responsive Data table is a highly flexible tool built upon the foundations of progressive enhancement, that adds all of these advanced features to any flutter table. It will speed up the production by removing some strugglings.
 
 ## Example
 
