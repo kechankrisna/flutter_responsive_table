@@ -1,3 +1,7 @@
+## 0.1.1+4
+
+* remove some warnings
+
 ## 0.1.1+3
 
 * remove selectableKey , constrains, and decoration
