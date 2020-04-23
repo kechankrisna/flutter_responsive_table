@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_context/responsive_context.dart';
 
 import 'DatatableHeader.dart';
 
@@ -234,7 +233,7 @@ class ResponsiveDatatable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return context.isExtraSmall || context.isSmall || context.isMedium
+    return MediaQuery.of(context).size.width <= 992
         ?
         /**
          * for small screen

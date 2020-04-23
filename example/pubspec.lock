@@ -81,13 +81,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.7.0"
-  responsive_context:
-    dependency: transitive
-    description:
-      name: responsive_context
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.1"
   responsive_table:
     dependency: "direct main"
     description:
