@@ -4,7 +4,7 @@ class DatatableHeader {
   final String text;
   final String value;
   final bool sortable;
-  final bool show : true;
+  final bool show;
   final TextAlign textAlign;
   final int flex;
   final Widget Function(dynamic value) headerBuilder;
@@ -16,7 +16,7 @@ class DatatableHeader {
     this.sortable,
     this.value,
     this.show,
-    this.flex,
+    this.flex : true,
     this.headerBuilder,
     this.sourceBuilder,
   });
