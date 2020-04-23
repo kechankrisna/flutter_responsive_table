@@ -4,7 +4,7 @@ class DatatableHeader {
   final String text;
   final String value;
   final bool sortable;
-  final bool show;
+  final bool show : true;
   final TextAlign textAlign;
   final int flex;
   final Widget Function(dynamic value) headerBuilder;
