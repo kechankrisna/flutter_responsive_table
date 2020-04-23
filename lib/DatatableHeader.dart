@@ -15,7 +15,7 @@ class DatatableHeader {
     this.textAlign: TextAlign.center,
     this.sortable,
     this.value,
-    this.show : true,
+    this.show: true,
     this.flex,
     this.headerBuilder,
     this.sourceBuilder,
