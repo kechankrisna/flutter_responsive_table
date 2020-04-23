@@ -122,7 +122,7 @@ class _DataPageState extends State<DataPage> {
   int _currentPage = 1;
   bool _isSearch = false;
   List<Map<String, dynamic>> _source = List<Map<String, dynamic>>();
-  List<int> _selecteds = List<int>();
+  List<Map<String, dynamic>> _selecteds = List<Map<String, dynamic>>();
   String _selectableKey = "id";
 
   String _sortColumn;
@@ -189,56 +189,55 @@ class _DataPageState extends State<DataPage> {
         ),
       ),
       body: ResponsiveDatatable(
-        // constraints: BoxConstraints(maxHeight: 450),
-        isLoading: _isLoading,
-        title: !_isSearch
-            ? RaisedButton.icon(
-                onPressed: () {},
-                icon: Icon(Icons.add),
-                label: Text("ADD CATEGORY"))
-            : null,
-        actions: [
-          
-          if (_isSearch)
-            Expanded(
-                child: TextField(
-              decoration: InputDecoration(
-                  prefixIcon: IconButton(
-                      icon: Icon(Icons.cancel),
-                      onPressed: () {
-                        setState(() {
-                          _isSearch = false;
-                        });
-                      }),
-                  suffixIcon:
-                      IconButton(icon: Icon(Icons.search), onPressed: () {})),
-            )),
-          if (!_isSearch)
-            IconButton(
-                icon: Icon(Icons.search),
-                onPressed: () {
-                  setState(() {
-                    _isSearch = true;
-                  });
-                })
-        ],
+        constraints: BoxConstraints(maxHeight: 450),
+       isLoading: _isLoading,
+       title: !_isSearch
+           ? RaisedButton.icon(
+               onPressed: () {},
+               icon: Icon(Icons.add),
+               label: Text("ADD CATEGORY"))
+           : null,
+       actions: [
+
+         if (_isSearch)
+           Expanded(
+               child: TextField(
+             decoration: InputDecoration(
+                 prefixIcon: IconButton(
+                     icon: Icon(Icons.cancel),
+                     onPressed: () {
+                       setState(() {
+                         _isSearch = false;
+                       });
+                     }),
+                 suffixIcon:
+                     IconButton(icon: Icon(Icons.search), onPressed: () {})),
+           )),
+         if (!_isSearch)
+           IconButton(
+               icon: Icon(Icons.search),
+               onPressed: () {
+                 setState(() {
+                   _isSearch = true;
+                 });
+               })
+       ],
         headers: _headers,
         source: _source,
         selecteds: _selecteds,
-        selectableKey: _selectableKey,
-        onSelect: (value, id) {
-          print("$value 157 $id ");
+        onSelect: (value, item) {
+          print("$value 157 $item ");
           if (value) {
-            setState(() => _selecteds.add(id));
+            setState(() => _selecteds.add(item));
           } else {
-            setState(() => _selecteds.removeAt(_selecteds.indexOf(id)));
+            setState(() => _selecteds.removeAt(_selecteds.indexOf(item)));
           }
         },
         onSelectAll: (value) {
           print(value);
           if (value) {
             setState(() => _selecteds =
-                _source.map((entry) => entry[_selectableKey]).toList().cast());
+                _source.map((entry) => entry).toList().cast());
           } else {
             setState(() => _selecteds.clear());
           }
@@ -262,54 +261,54 @@ class _DataPageState extends State<DataPage> {
             }
           });
         },
-        footers: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 15),
-            child: Text("Rows per page:"),
-          ),
-          if (_perPages != null)
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              child: DropdownButton(
-                  value: _currentPerPage,
-                  items: _perPages
-                      .map((e) => DropdownMenuItem(
-                            child: Text("$e"),
-                            value: e,
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _currentPerPage = value;
-                    });
-                  }),
-            ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 15),
-            child: Text("$_currentPage - $_currentPerPage of $_total"),
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              size: 16,
-            ),
-            onPressed: () {
-              setState(() {
-                _currentPage = _currentPage >= 2 ? _currentPage - 1 : 1;
-              });
-            },
-            padding: EdgeInsets.symmetric(horizontal: 15),
-          ),
-          IconButton(
-            icon: Icon(Icons.arrow_forward_ios, size: 16),
-            onPressed: () {
-              setState(() {
-                _currentPage++;
-              });
-            },
-            padding: EdgeInsets.symmetric(horizontal: 15),
-          )
-        ],
+       footers: [
+         Container(
+           padding: EdgeInsets.symmetric(horizontal: 15),
+           child: Text("Rows per page:"),
+         ),
+         if (_perPages != null)
+           Container(
+             padding: EdgeInsets.symmetric(horizontal: 15),
+             child: DropdownButton(
+                 value: _currentPerPage,
+                 items: _perPages
+                     .map((e) => DropdownMenuItem(
+                           child: Text("$e"),
+                           value: e,
+                         ))
+                     .toList(),
+                 onChanged: (value) {
+                   setState(() {
+                     _currentPerPage = value;
+                   });
+                 }),
+           ),
+         Container(
+           padding: EdgeInsets.symmetric(horizontal: 15),
+           child: Text("$_currentPage - $_currentPerPage of $_total"),
+         ),
+         IconButton(
+           icon: Icon(
+             Icons.arrow_back_ios,
+             size: 16,
+           ),
+           onPressed: () {
+             setState(() {
+               _currentPage = _currentPage >= 2 ? _currentPage - 1 : 1;
+             });
+           },
+           padding: EdgeInsets.symmetric(horizontal: 15),
+         ),
+         IconButton(
+           icon: Icon(Icons.arrow_forward_ios, size: 16),
+           onPressed: () {
+             setState(() {
+               _currentPage++;
+             });
+           },
+           padding: EdgeInsets.symmetric(horizontal: 15),
+         )
+       ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

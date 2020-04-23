@@ -6,13 +6,12 @@ class ResponsiveDatatable extends StatefulWidget {
   final bool showSelect;
   final List<DatatableHeader> headers;
   final List<Map<String, dynamic>> source;
-  final List<int> selecteds;
+  final List<Map<String, dynamic>> selecteds;
   final Widget title;
   final List<Widget> actions;
   final List<Widget> footers;
-  final String selectableKey;
   final Function(bool value) onSelectAll;
-  final Function(bool value, int index) onSelect;
+  final Function(bool value, Map<String, dynamic> data) onSelect;
   final Function(dynamic value) onTabRow;
   final Function(dynamic value) onSort;
   final BoxDecoration decoration;
@@ -24,7 +23,6 @@ class ResponsiveDatatable extends StatefulWidget {
   const ResponsiveDatatable({
     Key key,
     this.showSelect: true,
-    this.selectableKey: "id",
     this.onSelectAll,
     this.onSelect,
     this.onTabRow,
@@ -48,7 +46,6 @@ class ResponsiveDatatable extends StatefulWidget {
 class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
   @override
   initState() {
-    assert(this.widget.selectableKey != null);
     super.initState();
   }
 
@@ -82,7 +79,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                     child: ListView(
                         // itemCount: this.widget.source.length,
                         children: [
-                          if (this.widget.showSelect)
+                          if (this.widget.showSelect && this.widget.selecteds != null)
                             Wrap(
                               alignment: WrapAlignment.spaceBetween,
                               children: [
@@ -158,23 +155,13 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Spacer(),
-                                        if (this.widget.showSelect)
+                                        if (this.widget.showSelect && this.widget.selecteds != null)
                                           Checkbox(
-                                              value: this
-                                                      .widget
-                                                      .selecteds
-                                                      .indexOf(data[this
-                                                          .widget
-                                                          .selectableKey]) >=
-                                                  0,
+                                              value: this.widget.selecteds.indexOf(data) >= 0,
                                               onChanged: (value) {
                                                 if (this.widget.onSelect !=
                                                     null)
-                                                  this.widget.onSelect(
-                                                      value,
-                                                      data[this
-                                                          .widget
-                                                          .selectableKey]);
+                                                  this.widget.onSelect(value, data);
                                               }),
                                       ],
                                     ),
@@ -259,7 +246,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (this.widget.showSelect)
+                        if (this.widget.showSelect && this.widget.selecteds != null)
                           Checkbox(
                               value: this.widget.selecteds.length ==
                                       this.widget.source.length &&
@@ -341,20 +328,12 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    if (this.widget.showSelect)
+                                    if (this.widget.showSelect && this.widget.selecteds != null)
                                       Checkbox(
-                                          value: this.widget.selecteds.indexOf(
-                                                  data[this
-                                                      .widget
-                                                      .selectableKey]) >=
-                                              0,
+                                          value: this.widget.selecteds.indexOf(data) >= 0,
                                           onChanged: (value) {
                                             if (this.widget.onSelect != null)
-                                              this.widget.onSelect(
-                                                  value,
-                                                  data[this
-                                                      .widget
-                                                      .selectableKey]);
+                                              this.widget.onSelect(value, data);
                                           }),
                                     ...this
                                         .widget
