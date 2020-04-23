@@ -7,7 +7,51 @@ Responsive Data table is a highly flexible tool built upon the foundations of pr
 ![screenshot](https://raw.githubusercontent.com/kechankrisna/flutter_responsive_table/master/example/sreenshot.png)
 
 ```
-    List<DatatableHeader> _headers = [
+    import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:responsive_table/responsive_table.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      initialRoute: '/',
+      routes: {
+        '/': (_) => DataPage(),
+      },
+    );
+  }
+}
+
+class DataPickerPage extends StatefulWidget {
+  @override
+  _DataPickerPageState createState() => _DataPickerPageState();
+}
+
+class _DataPickerPageState extends State<DataPickerPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+
+class DataPage extends StatefulWidget {
+  DataPage({Key key}) : super(key: key);
+  @override
+  _DataPageState createState() => _DataPageState();
+}
+
+class _DataPageState extends State<DataPage> {
+  List<DatatableHeader> _headers = [
     DatatableHeader(
         text: "ID",
         value: "id",
@@ -87,11 +131,13 @@ Responsive Data table is a highly flexible tool built upon the foundations of pr
   int _currentPage = 1;
   bool _isSearch = false;
   List<Map<String, dynamic>> _source = List<Map<String, dynamic>>();
-  List<int> _selecteds = List<int>();
+  List<Map<String, dynamic>> _selecteds = List<Map<String, dynamic>>();
   String _selectableKey = "id";
 
   String _sortColumn;
   bool _sortAscending = true;
+  bool _isLoading = true;
+  bool _showSelect = true;
 
   List<Map<String, dynamic>> _generateData({int n: 100}) {
     final List source = List.filled(n, Random.secure());
@@ -116,162 +162,185 @@ Responsive Data table is a highly flexible tool built upon the foundations of pr
     return temps;
   }
 
-  Scaffold(
+
+  _initData() async {
+    setState(() => _isLoading = true);
+    Future.delayed(Duration(seconds: 3)).then((value) {
+      _source.addAll(_generateData(n: 1000));
+      setState(() => _isLoading = false);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initData();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
       appBar: AppBar(
         title: Text("DATA TABLE"),
       ),
-      drawer: Drawer(
-        child: ListView.separated(
-          itemCount: List.filled(100, Random.secure()).length,
-          itemBuilder: (_, index) => ExpansionTile(
-            leading: Icon(Icons.verified_user),
-            title: Text("$index"),
-            // trailing: Text("$index"),
-            children: List.filled(10, Random.secure())
-                .map((e) => ListTile(
-                      leading: SizedBox(),
-                      title: Text("$e"),
-                    ))
-                .toList(),
-          ),
-          separatorBuilder: (_, index) => Divider(
-            thickness: 1,
-            height: 1,
-          ),
-        ),
-      ),
-      body: ResponsiveDatatable(
-        // constraints: BoxConstraints(maxHeight: 450),
-        title: !_isSearch
-            ? RaisedButton.icon(
-                onPressed: () {},
-                icon: Icon(Icons.add),
-                label: Text("ADD CATEGORY"))
-            : null,
-        actions: [
-          if (_isSearch)
-            Expanded(
-                child: TextField(
-              decoration: InputDecoration(
-                  prefixIcon: IconButton(
-                      icon: Icon(Icons.cancel),
+      
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Container(
+              margin: EdgeInsets.all(10),
+              padding: EdgeInsets.all(0),
+              constraints: BoxConstraints(
+                maxHeight: 700,
+              ),
+              child: Card(
+                elevation: 1,
+                shadowColor: Colors.black,
+                clipBehavior: Clip.none,
+                child: ResponsiveDatatable(
+                  title: !_isSearch
+                      ? RaisedButton.icon(
+                          onPressed: () {},
+                          icon: Icon(Icons.add),
+                          label: Text("ADD CATEGORY"))
+                      : null,
+                  actions: [
+                    if (_isSearch)
+                      Expanded(
+                          child: TextField(
+                        decoration: InputDecoration(
+                            prefixIcon: IconButton(
+                                icon: Icon(Icons.cancel),
+                                onPressed: () {
+                                  setState(() {
+                                    _isSearch = false;
+                                  });
+                                }),
+                            suffixIcon: IconButton(
+                                icon: Icon(Icons.search), onPressed: () {})),
+                      )),
+                    if (!_isSearch)
+                      IconButton(
+                          icon: Icon(Icons.search),
+                          onPressed: () {
+                            setState(() {
+                              _isSearch = true;
+                            });
+                          })
+                  ],
+                  headers: _headers,
+                  source: _source,
+                  selecteds: _selecteds,
+                  showSelect: _showSelect,
+                  autoHeight: false,
+                  onTabRow: (data) {
+                    print(data);
+                  },
+                  onSort: (value) {
+                    setState(() {
+                      _sortColumn = value;
+                      _sortAscending = !_sortAscending;
+                      if (_sortAscending) {
+                        _source.sort((a, b) =>
+                            b["$_sortColumn"].compareTo(a["$_sortColumn"]));
+                      } else {
+                        _source.sort((a, b) =>
+                            a["$_sortColumn"].compareTo(b["$_sortColumn"]));
+                      }
+                    });
+                  },
+                  sortAscending: _sortAscending,
+                  sortColumn: _sortColumn,
+                  isLoading: _isLoading,
+                  onSelect: (value, item) {
+                    print("$value  $item ");
+                    if (value) {
+                      setState(() => _selecteds.add(item));
+                    } else {
+                      setState(
+                          () => _selecteds.removeAt(_selecteds.indexOf(item)));
+                    }
+                  },
+                  onSelectAll: (value) {
+                    if (value) {
+                      setState(() => _selecteds =
+                          _source.map((entry) => entry).toList().cast());
+                    } else {
+                      setState(() => _selecteds.clear());
+                    }
+                  },
+                  footers: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      child: Text("Rows per page:"),
+                    ),
+                    if (_perPages != null)
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 15),
+                        child: DropdownButton(
+                            value: _currentPerPage,
+                            items: _perPages
+                                .map((e) => DropdownMenuItem(
+                                      child: Text("$e"),
+                                      value: e,
+                                    ))
+                                .toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _currentPerPage = value;
+                              });
+                            }),
+                      ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      child:
+                          Text("$_currentPage - $_currentPerPage of $_total"),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back_ios,
+                        size: 16,
+                      ),
                       onPressed: () {
                         setState(() {
-                          _isSearch = false;
+                          _currentPage =
+                              _currentPage >= 2 ? _currentPage - 1 : 1;
                         });
-                      }),
-                  suffixIcon:
-                      IconButton(icon: Icon(Icons.search), onPressed: () {})),
-            )),
-          if (!_isSearch)
-            IconButton(
-                icon: Icon(Icons.search),
-                onPressed: () {
-                  setState(() {
-                    _isSearch = true;
-                  });
-                })
-        ],
-        headers: _headers,
-        source: _source,
-        selecteds: _selecteds,
-        selectableKey: _selectableKey,
-        onSelect: (value, id) {
-          print("$value 157 $id ");
-          if (value) {
-            setState(() => _selecteds.add(id));
-          } else {
-            setState(() => _selecteds.removeAt(_selecteds.indexOf(id)));
-          }
-        },
-        onSelectAll: (value) {
-          print(value);
-          if (value) {
-            setState(() => _selecteds =
-                _source.map((entry) => entry[_selectableKey]).toList().cast());
-          } else {
-            setState(() => _selecteds.clear());
-          }
-        },
-        onTabRow: (value) => print(value),
-        sortColumn: _sortColumn,
-        sortAscending: _sortAscending,
-        showSelect: true,
-        onSort: (value) {
-          setState(() {
-            _sortColumn = value;
-            _sortAscending = !_sortAscending;
-          });
-          setState(() {
-            if (_sortAscending) {
-              _source.sort(
-                  (a, b) => b["$_sortColumn"].compareTo(a["$_sortColumn"]));
-            } else {
-              _source.sort(
-                  (a, b) => a["$_sortColumn"].compareTo(b["$_sortColumn"]));
-            }
-          });
-        },
-        footers: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 15),
-            child: Text("Rows per page:"),
-          ),
-          if (_perPages != null)
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              child: DropdownButton(
-                  value: _currentPerPage,
-                  items: _perPages
-                      .map((e) => DropdownMenuItem(
-                            child: Text("$e"),
-                            value: e,
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _currentPerPage = value;
-                    });
-                  }),
+                      },
+                      padding: EdgeInsets.symmetric(horizontal: 15),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.arrow_forward_ios, size: 16),
+                      onPressed: () {
+                        setState(() {
+                          _currentPage++;
+                        });
+                      },
+                      padding: EdgeInsets.symmetric(horizontal: 15),
+                    )
+                  ],
+                ),
+              ),
             ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 15),
-            child: Text("$_currentPage - $_currentPerPage of $_total"),
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              size: 16,
-            ),
-            onPressed: () {
-              setState(() {
-                _currentPage = _currentPage >= 2 ? _currentPage - 1 : 1;
-              });
-            },
-            padding: EdgeInsets.symmetric(horizontal: 15),
-          ),
-          IconButton(
-            icon: Icon(Icons.arrow_forward_ios, size: 16),
-            onPressed: () {
-              setState(() {
-                _currentPage++;
-              });
-            },
-            padding: EdgeInsets.symmetric(horizontal: 15),
-          )
-        ],
+          ] 
+        )
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          var temp = _generateData();
-
-          setState(() {
-            _source.addAll(temp);
-          });
+          _initData();
         },
         child: Icon(Icons.add),
       ),
-    )
+    );
+  }
+}
 ```
 
 ### Methods
@@ -290,12 +359,13 @@ Responsive Data table is a highly flexible tool built upon the foundations of pr
     headers: List<DatatableHeader>
     actions: List<Widget>
     source: List<Map<String, dynamic>>
-    selecteds: List<int>
-    selectableKey: 
+    selecteds: List<Map<String, dynamic>>
     showSelect: bool
     footers: List<Widget>
     sortColumn: String
     sortAscending: bool
+    isLoading: bool,
+    autoHeight: bool,
 ```
 
 
