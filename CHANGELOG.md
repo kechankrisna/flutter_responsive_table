@@ -1,3 +1,9 @@
+## 0.1.1+5
+
+* add editable to DatatableHeader (false by default)
+
+* update some example for editable field
+
 ## 0.1.1+4
 
 * remove some warnings
