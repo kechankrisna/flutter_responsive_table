@@ -123,18 +123,10 @@ class ResponsiveDatatable extends StatelessWidget {
                           header.sourceBuilder != null
                               ? header.sourceBuilder(data[header.value])
                               : header.editable
-                                  ? Container(
-                                      constraints:
-                                          BoxConstraints(maxWidth: 150),
-                                      child: TextField(
-                                        controller:
-                                            TextEditingController.fromValue(
-                                          TextEditingValue(
-                                              text: "${data[header.value]}"),
-                                        ),
-                                        onChanged: (newValue) =>
-                                            data[header.value] = newValue,
-                                      ),
+                                  ? editAbleWidget(
+                                      data: data,
+                                      header: header,
+                                      textAlign: TextAlign.end,
                                     )
                                   : Text("${data[header.value]}")
                         ],
@@ -231,17 +223,10 @@ class ResponsiveDatatable extends StatelessWidget {
                         child: header.sourceBuilder != null
                             ? header.sourceBuilder(data[header.value])
                             : header.editable
-                                ? Container(
-                                    constraints: BoxConstraints(maxWidth: 150),
-                                    child: TextField(
-                                      controller:
-                                          TextEditingController.fromValue(
-                                        TextEditingValue(
-                                            text: "${data[header.value]}"),
-                                      ),
-                                      onChanged: (newValue) =>
-                                          data[header.value] = newValue,
-                                    ),
+                                ? editAbleWidget(
+                                    data: data,
+                                    header: header,
+                                    textAlign: header.textAlign,
                                   )
                                 : Container(
                                     child: Text(
@@ -257,6 +242,30 @@ class ResponsiveDatatable extends StatelessWidget {
       ));
     }
     return widgets;
+  }
+
+
+  Widget editAbleWidget(
+      {@required Map<String, dynamic> data,
+      @required DatatableHeader header,
+      TextAlign textAlign: TextAlign.center}) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: 150),
+      padding: EdgeInsets.all(0),
+      margin: EdgeInsets.all(0),
+      child: TextField(
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(0),
+          border: UnderlineInputBorder(borderSide: BorderSide(width: 1)),
+          alignLabelWithHint: true,
+        ),
+        textAlign: textAlign,
+        controller: TextEditingController.fromValue(
+          TextEditingValue(text: "${data[header.value]}"),
+        ),
+        onChanged: (newValue) => data[header.value] = newValue,
+      ),
+    );
   }
 
   @override
