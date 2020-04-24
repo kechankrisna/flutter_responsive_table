@@ -244,7 +244,6 @@ class ResponsiveDatatable extends StatelessWidget {
     return widgets;
   }
 
-
   Widget editAbleWidget(
       {@required Map<String, dynamic> data,
       @required DatatableHeader header,
