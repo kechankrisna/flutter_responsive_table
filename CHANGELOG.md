@@ -1,3 +1,7 @@
+## 0.1.1+6
+
+* seperate editable widget
+
 ## 0.1.1+5
 
 * add editable to DatatableHeader (false by default)
