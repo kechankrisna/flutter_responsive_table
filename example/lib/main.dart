@@ -55,6 +55,7 @@ class _DataPageState extends State<DataPage> {
         show: true,
         flex: 2,
         sortable: true,
+        editable:true,
         textAlign: TextAlign.left),
     DatatableHeader(
         text: "SKU",
@@ -157,7 +158,7 @@ class _DataPageState extends State<DataPage> {
   _initData() async {
     setState(() => _isLoading = true);
     Future.delayed(Duration(seconds: 3)).then((value) {
-      _source.addAll(_generateData(n: 1000));
+      _source.addAll(_generateData(n: 10)); //1000
       setState(() => _isLoading = false);
     });
   }
@@ -178,6 +179,11 @@ class _DataPageState extends State<DataPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("DATA TABLE"),
+        actions: [
+          RaisedButton(onPressed: (){
+            print(_source);
+          }, child: Text("SHOW")),
+        ],
       ),
       
       body: SingleChildScrollView(
