@@ -122,7 +122,21 @@ class ResponsiveDatatable extends StatelessWidget {
                           Spacer(),
                           header.sourceBuilder != null
                               ? header.sourceBuilder(data[header.value])
-                              : Text("${data[header.value]}")
+                              : header.editable
+                                  ? Container(
+                                      constraints:
+                                          BoxConstraints(maxWidth: 150),
+                                      child: TextField(
+                                        controller:
+                                            TextEditingController.fromValue(
+                                          TextEditingValue(
+                                              text: "${data[header.value]}"),
+                                        ),
+                                        onChanged: (newValue) =>
+                                            data[header.value] = newValue,
+                                      ),
+                                    )
+                                  : Text("${data[header.value]}")
                         ],
                       ),
                     ),
@@ -213,15 +227,29 @@ class ResponsiveDatatable extends StatelessWidget {
                     .where((header) => header.show == true)
                     .map(
                       (header) => Expanded(
-                          flex: header.flex ?? 1,
-                          child: header.sourceBuilder != null
-                              ? header.sourceBuilder(data[header.value])
-                              : Container(
-                                  child: Text(
-                                    "${data[header.value]}",
-                                    textAlign: header.textAlign,
+                        flex: header.flex ?? 1,
+                        child: header.sourceBuilder != null
+                            ? header.sourceBuilder(data[header.value])
+                            : header.editable
+                                ? Container(
+                                    constraints: BoxConstraints(maxWidth: 150),
+                                    child: TextField(
+                                      controller:
+                                          TextEditingController.fromValue(
+                                        TextEditingValue(
+                                            text: "${data[header.value]}"),
+                                      ),
+                                      onChanged: (newValue) =>
+                                          data[header.value] = newValue,
+                                    ),
+                                  )
+                                : Container(
+                                    child: Text(
+                                      "${data[header.value]}",
+                                      textAlign: header.textAlign,
+                                    ),
                                   ),
-                                )),
+                      ),
                     )
                     .toList()
               ],

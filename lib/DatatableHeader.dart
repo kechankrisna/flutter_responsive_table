@@ -4,6 +4,7 @@ class DatatableHeader {
   final String text;
   final String value;
   final bool sortable;
+  final bool editable;
   final bool show;
   final TextAlign textAlign;
   final int flex;
@@ -16,6 +17,7 @@ class DatatableHeader {
     this.sortable,
     this.value,
     this.show: true,
+    this.editable: false,
     this.flex,
     this.headerBuilder,
     this.sourceBuilder,
