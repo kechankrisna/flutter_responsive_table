@@ -98,7 +98,7 @@ class _DataPageState extends State<DataPage> {
         value: "received",
         show: true,
         sortable: false,
-        sourceBuilder: (value) {
+        sourceBuilder: (value, row) {
           List list = List.from(value);
           return Container(
             child: Column(

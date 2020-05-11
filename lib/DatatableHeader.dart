@@ -5,11 +5,11 @@ class DatatableHeader {
   final String value;
   final bool sortable;
   final bool editable;
-  final bool show;
+  bool show;
   final TextAlign textAlign;
   final int flex;
   final Widget Function(dynamic value) headerBuilder;
-  final Widget Function(dynamic value) sourceBuilder;
+  final Widget Function(dynamic value, Map<String, dynamic> row) sourceBuilder;
 
   DatatableHeader({
     this.text,
