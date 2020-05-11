@@ -1,3 +1,9 @@
+# 0.1.1+7
+
+* integrate with responsive_context
+* return (value, row) onSourceBuilder
+* add hideUnderline to hideBottomBorder
+
 ## 0.1.1+6
 
 * seperate editable widget

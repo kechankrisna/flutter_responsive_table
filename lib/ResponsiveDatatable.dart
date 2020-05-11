@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:responsive_context/responsive_context.dart';
 
 import 'DatatableHeader.dart';
 
-class ResponsiveDatatable extends StatelessWidget {
+class ResponsiveDatatable extends StatefulWidget {
   final bool showSelect;
   final List<DatatableHeader> headers;
   final List<Map<String, dynamic>> source;
@@ -18,10 +19,11 @@ class ResponsiveDatatable extends StatelessWidget {
   final bool sortAscending;
   final bool isLoading;
   final bool autoHeight;
+  final bool hideUnderline;
 
   const ResponsiveDatatable({
     Key key,
-    this.showSelect: true,
+    this.showSelect: false,
     this.onSelectAll,
     this.onSelect,
     this.onTabRow,
@@ -35,27 +37,38 @@ class ResponsiveDatatable extends StatelessWidget {
     this.sortColumn,
     this.sortAscending,
     this.isLoading: false,
-    this.autoHeight: false,
+    this.autoHeight: true,
+    this.hideUnderline: true,
   }) : super(key: key);
+
+  @override
+  _ResponsiveDatatableState createState() => _ResponsiveDatatableState();
+}
+
+class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
   Widget mobileHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Checkbox(
-            value: selecteds.length == source.length &&
-                source != null &&
-                source.length > 0,
+            value: widget.selecteds.length == widget.source.length &&
+                widget.source != null &&
+                widget.source.length > 0,
             onChanged: (value) {
-              if (onSelectAll != null) onSelectAll(value);
+              if (widget.onSelectAll != null) widget.onSelectAll(value);
             }),
-        DropdownButton(
-            hint: Text("SORT BY"),
-            value: sortColumn,
-            items: headers
+        PopupMenuButton(
+            child: Container(
+              padding: EdgeInsets.all(15),
+              child: Text("SORT BY"),
+            ),
+            tooltip: "SORT BY",
+            initialValue: widget.sortColumn,
+            itemBuilder: (_) => widget.headers
                 .where(
                     (header) => header.show == true && header.sortable == true)
                 .toList()
-                .map((header) => DropdownMenuItem(
+                .map((header) => PopupMenuItem(
                       child: Wrap(
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
@@ -63,8 +76,9 @@ class ResponsiveDatatable extends StatelessWidget {
                             "${header.text}",
                             textAlign: header.textAlign,
                           ),
-                          if (sortColumn != null && sortColumn == header.value)
-                            sortAscending
+                          if (widget.sortColumn != null &&
+                              widget.sortColumn == header.value)
+                            widget.sortAscending
                                 ? Icon(Icons.arrow_downward, size: 15)
                                 : Icon(Icons.arrow_upward, size: 15)
                         ],
@@ -72,19 +86,21 @@ class ResponsiveDatatable extends StatelessWidget {
                       value: header.value,
                     ))
                 .toList(),
-            onChanged: (value) {
-              if (onSort != null) onSort(value);
+            onSelected: (value) {
+              if (widget.onSort != null) widget.onSort(value);
             })
       ],
     );
   }
 
   List<Widget> mobileList() {
-    return source.map((data) {
+    return widget.source.map((data) {
       return InkWell(
-        onTap: () {
-          if (onTabRow != null) onTabRow(data);
-        },
+        onTap: widget.onTabRow != null
+            ? () {
+                widget.onTabRow(data);
+              }
+            : null,
         child: Container(
           decoration: BoxDecoration(
               border: Border(
@@ -96,15 +112,16 @@ class ResponsiveDatatable extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Spacer(),
-                  if (showSelect && selecteds != null)
+                  if (widget.showSelect && widget.selecteds != null)
                     Checkbox(
-                        value: selecteds.indexOf(data) >= 0,
+                        value: widget.selecteds.indexOf(data) >= 0,
                         onChanged: (value) {
-                          if (onSelect != null) onSelect(value, data);
+                          if (widget.onSelect != null)
+                            widget.onSelect(value, data);
                         }),
                 ],
               ),
-              ...headers
+              ...widget.headers
                   .where((header) => header.show == true)
                   .toList()
                   .map(
@@ -121,7 +138,7 @@ class ResponsiveDatatable extends StatelessWidget {
                                 ),
                           Spacer(),
                           header.sourceBuilder != null
-                              ? header.sourceBuilder(data[header.value])
+                              ? header.sourceBuilder(data[header.value], data)
                               : header.editable
                                   ? editAbleWidget(
                                       data: data,
@@ -141,35 +158,53 @@ class ResponsiveDatatable extends StatelessWidget {
     }).toList();
   }
 
+  Alignment headerAlignSwitch(TextAlign textAlign) {
+    switch (textAlign) {
+      case TextAlign.center:
+        return Alignment.center;
+        break;
+      case TextAlign.left:
+        return Alignment.centerLeft;
+        break;
+      case TextAlign.right:
+        return Alignment.centerRight;
+        break;
+      default:
+        return Alignment.center;
+    }
+  }
+
   Widget desktopHeader() {
     return Container(
       decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: Colors.grey, width: 1))),
+          border:
+              Border(bottom: BorderSide(color: Colors.grey[300], width: 1))),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (showSelect && selecteds != null)
+          if (widget.showSelect && widget.selecteds != null)
             Checkbox(
-                value: selecteds.length == source.length &&
-                    source != null &&
-                    source.length > 0,
+                value: widget.selecteds.length == widget.source.length &&
+                    widget.source != null &&
+                    widget.source.length > 0,
                 onChanged: (value) {
-                  if (onSelectAll != null) onSelectAll(value);
+                  if (widget.onSelectAll != null) widget.onSelectAll(value);
                 }),
-          ...headers
+          ...widget.headers
               .where((header) => header.show == true)
               .map(
                 (header) => Expanded(
                     flex: header.flex ?? 1,
                     child: InkWell(
                       onTap: () {
-                        if (onSort != null && header.sortable)
-                          onSort(header.value);
+                        if (widget.onSort != null && header.sortable)
+                          widget.onSort(header.value);
                       },
                       child: header.headerBuilder != null
                           ? header.headerBuilder(header.value)
                           : Container(
                               padding: EdgeInsets.all(11),
+                              alignment: headerAlignSwitch(header.textAlign),
                               child: Wrap(
                                 crossAxisAlignment: WrapCrossAlignment.center,
                                 children: [
@@ -177,9 +212,9 @@ class ResponsiveDatatable extends StatelessWidget {
                                     "${header.text}",
                                     textAlign: header.textAlign,
                                   ),
-                                  if (sortColumn != null &&
-                                      sortColumn == header.value)
-                                    sortAscending
+                                  if (widget.sortColumn != null &&
+                                      widget.sortColumn == header.value)
+                                    widget.sortAscending
                                         ? Icon(Icons.arrow_downward, size: 15)
                                         : Icon(Icons.arrow_upward, size: 15)
                                 ],
@@ -195,33 +230,36 @@ class ResponsiveDatatable extends StatelessWidget {
 
   List<Widget> desktopList() {
     List<Widget> widgets = [];
-    for (var index = 0; index < source.length; index++) {
-      final data = source[index];
+    for (var index = 0; index < widget.source.length; index++) {
+      final data = widget.source[index];
       widgets.add(InkWell(
-        onTap: () {
-          if (onTabRow != null) onTabRow(data);
-        },
+        onTap: widget.onTabRow != null
+            ? () {
+                widget.onTabRow(data);
+              }
+            : null,
         child: Container(
-            padding: EdgeInsets.all(showSelect ? 0 : 11),
+            padding: EdgeInsets.all(widget.showSelect ? 0 : 11),
             decoration: BoxDecoration(
                 border: Border(
                     bottom: BorderSide(color: Colors.grey[300], width: 1))),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (showSelect && selecteds != null)
+                if (widget.showSelect && widget.selecteds != null)
                   Checkbox(
-                      value: selecteds.indexOf(data) >= 0,
+                      value: widget.selecteds.indexOf(data) >= 0,
                       onChanged: (value) {
-                        if (onSelect != null) onSelect(value, data);
+                        if (widget.onSelect != null)
+                          widget.onSelect(value, data);
                       }),
-                ...headers
+                ...widget.headers
                     .where((header) => header.show == true)
                     .map(
                       (header) => Expanded(
                         flex: header.flex ?? 1,
                         child: header.sourceBuilder != null
-                            ? header.sourceBuilder(data[header.value])
+                            ? header.sourceBuilder(data[header.value], data)
                             : header.editable
                                 ? editAbleWidget(
                                     data: data,
@@ -244,10 +282,11 @@ class ResponsiveDatatable extends StatelessWidget {
     return widgets;
   }
 
-  Widget editAbleWidget(
-      {@required Map<String, dynamic> data,
-      @required DatatableHeader header,
-      TextAlign textAlign: TextAlign.center}) {
+  Widget editAbleWidget({
+    @required Map<String, dynamic> data,
+    @required DatatableHeader header,
+    TextAlign textAlign: TextAlign.center,
+  }) {
     return Container(
       constraints: BoxConstraints(maxWidth: 150),
       padding: EdgeInsets.all(0),
@@ -255,7 +294,9 @@ class ResponsiveDatatable extends StatelessWidget {
       child: TextField(
         decoration: InputDecoration(
           contentPadding: EdgeInsets.all(0),
-          border: UnderlineInputBorder(borderSide: BorderSide(width: 1)),
+          border: this.widget.hideUnderline
+              ? InputBorder.none
+              : UnderlineInputBorder(borderSide: BorderSide(width: 1)),
           alignLabelWithHint: true,
         ),
         textAlign: textAlign,
@@ -269,7 +310,7 @@ class ResponsiveDatatable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MediaQuery.of(context).size.width <= 992
+    return context.isExtraSmall || context.isSmall || context.isMedium
         ?
         /**
          * for small screen
@@ -279,36 +320,41 @@ class ResponsiveDatatable extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 //title and actions
-                if (title != null || actions != null)
+                if (widget.title != null || widget.actions != null)
                   Container(
-                    padding: EdgeInsets.all(15),
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        border: Border(
+                            bottom: BorderSide(color: Colors.grey[300]))),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        if (title != null) title,
-                        if (actions != null) ...actions
+                        if (widget.title != null) widget.title,
+                        if (widget.actions != null) ...widget.actions
                       ],
                     ),
                   ),
 
-                if (autoHeight)
+                if (widget.autoHeight)
                   Column(
                     children: [
-                      if (showSelect && selecteds != null) mobileHeader(),
-                      if (isLoading)
+                      if (widget.showSelect && widget.selecteds != null)
+                        mobileHeader(),
+                      if (widget.isLoading)
                         LinearProgressIndicator(),
                       //mobileList
                       ...mobileList(),
                     ],
                   ),
-                if (!autoHeight)
+                if (!widget.autoHeight)
                   Expanded(
                     child: Container(
                       child: ListView(
                         // itemCount: source.length,
                         children: [
-                          if (showSelect && selecteds != null) mobileHeader(),
-                          if (isLoading)
+                          if (widget.showSelect && widget.selecteds != null)
+                            mobileHeader(),
+                          if (widget.isLoading)
                             LinearProgressIndicator(),
                           //mobileList
                           ...mobileList(),
@@ -317,11 +363,11 @@ class ResponsiveDatatable extends StatelessWidget {
                     ),
                   ),
                 //footer
-                if (footers != null)
+                if (widget.footers != null)
                   Container(
                     child: Wrap(
                       crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [...footers],
+                      children: [...widget.footers],
                     ),
                   )
               ],
@@ -334,40 +380,43 @@ class ResponsiveDatatable extends StatelessWidget {
             child: Column(
               children: [
                 //title and actions
-                if (title != null || actions != null)
+                if (widget.title != null || widget.actions != null)
                   Container(
-                    padding: EdgeInsets.all(15),
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        border: Border(
+                            bottom: BorderSide(color: Colors.grey[300]))),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        if (title != null) title,
-                        if (actions != null) ...actions
+                        if (widget.title != null) widget.title,
+                        if (widget.actions != null) ...widget.actions
                       ],
                     ),
                   ),
 
                 //desktopHeader
-                if (headers != null && headers.isNotEmpty)
+                if (widget.headers != null && widget.headers.isNotEmpty)
                   desktopHeader(),
 
-                if (isLoading)
+                if (widget.isLoading)
                   LinearProgressIndicator(),
 
-                if (autoHeight)
+                if (widget.autoHeight)
                   Column(children: desktopList()),
 
-                if (!autoHeight)
+                if (!widget.autoHeight)
                   // desktopList
-                  if (source != null && source.isNotEmpty)
+                  if (widget.source != null && widget.source.isNotEmpty)
                     Expanded(
                         child: Container(
                             child: ListView(children: desktopList()))),
 
                 //footer
-                if (footers != null)
+                if (widget.footers != null)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
-                    children: [...footers],
+                    children: [...widget.footers],
                   )
               ],
             ),

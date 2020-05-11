@@ -1,6 +1,6 @@
 name: responsive_table
 description: Responsive Data table is a highly flexible tool built upon the foundations of progressive enhancement, that adds all of these advanced features to any flutter table.
-version: 0.1.1+6
+version: 0.1.1+7
 homepage: https://github.com/kechankrisna/flutter_responsive_table
 
 environment:
@@ -9,7 +9,8 @@ environment:
 
 dependencies:
   flutter:
-    sdk: flutter 
+    sdk: flutter
+  responsive_context: ^0.1.2   
 
 dev_dependencies:
   flutter_test:
