@@ -55,7 +55,7 @@ class _DataPageState extends State<DataPage> {
         show: true,
         flex: 2,
         sortable: true,
-        editable:true,
+        editable: true,
         textAlign: TextAlign.left),
     DatatableHeader(
         text: "SKU",
@@ -117,9 +117,38 @@ class _DataPageState extends State<DataPage> {
         textAlign: TextAlign.center),
   ];
 
-  List<int> _perPages = [5, 10, 15, 100];
+  Widget _dropContainer(data) {
+    List<Widget> _children = data.entries.map<Widget>((entry) {
+      Widget w = Row(
+        children: [
+          Text(entry.key.toString()),
+          Spacer(),
+          Text(entry.value.toString()),
+        ],
+      );
+      return w;
+    }).toList();
+    return Container(
+      // height: 100,
+      child: Column(
+        // children: [
+        //   Expanded(
+        //       child: Container(
+        //     color: Colors.red,
+        //     height: 50,
+        //   )),
+
+        // ],
+        children:_children,
+      ),
+    );
+  }
+
+  List<int> _perPages = [10, 20, 50, 100];
   int _total = 100;
-  int _currentPerPage;
+  int _currentPerPage = 10;
+  List<bool> _expanded; // = List.generate(10, (index) => false);
+
   int _currentPage = 1;
   bool _isSearch = false;
   List<Map<String, dynamic>> _source = List<Map<String, dynamic>>();
@@ -154,11 +183,23 @@ class _DataPageState extends State<DataPage> {
     return temps;
   }
 
-
   _initData() async {
+    _expanded = List.generate(_currentPerPage, (index) => false);
+
     setState(() => _isLoading = true);
     Future.delayed(Duration(seconds: 3)).then((value) {
       _source.addAll(_generateData(n: 10)); //1000
+      setState(() => _isLoading = false);
+    });
+  }
+
+  _resetData() async {
+    setState(() => _isLoading = true);
+    Future.delayed(Duration(seconds: 3)).then((value) {
+      _expanded = List.generate(_currentPerPage, (index) => false);
+
+      _source.clear();
+      _source.addAll(_generateData(n: _currentPerPage)); //1000
       setState(() => _isLoading = false);
     });
   }
@@ -173,24 +214,24 @@ class _DataPageState extends State<DataPage> {
   void dispose() {
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("DATA TABLE"),
         actions: [
-          RaisedButton(onPressed: (){
-            print(_source);
-          }, child: Text("SHOW")),
+          // RaisedButton(onPressed: (){
+          //   print(_source);
+          // }, child: Text("SHOW")),
         ],
       ),
-      
+
       body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
-          children: [
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: [
             Container(
               margin: EdgeInsets.all(10),
               padding: EdgeInsets.all(0),
@@ -202,12 +243,7 @@ class _DataPageState extends State<DataPage> {
                 shadowColor: Colors.black,
                 clipBehavior: Clip.none,
                 child: ResponsiveDatatable(
-                  title: !_isSearch
-                      ? RaisedButton.icon(
-                          onPressed: () {},
-                          icon: Icon(Icons.add),
-                          label: Text("ADD CATEGORY"))
-                      : null,
+                  title: null,
                   actions: [
                     if (_isSearch)
                       Expanded(
@@ -237,6 +273,7 @@ class _DataPageState extends State<DataPage> {
                   selecteds: _selecteds,
                   showSelect: _showSelect,
                   autoHeight: false,
+                  dropContainer: _dropContainer,
                   onTabRow: (data) {
                     print(data);
                   },
@@ -253,6 +290,7 @@ class _DataPageState extends State<DataPage> {
                       }
                     });
                   },
+                  expanded: _expanded,
                   sortAscending: _sortAscending,
                   sortColumn: _sortColumn,
                   isLoading: _isLoading,
@@ -292,6 +330,7 @@ class _DataPageState extends State<DataPage> {
                             onChanged: (value) {
                               setState(() {
                                 _currentPerPage = value;
+                                _resetData();
                               });
                             }),
                       ),
@@ -306,9 +345,9 @@ class _DataPageState extends State<DataPage> {
                         size: 16,
                       ),
                       onPressed: () {
+                        var _nextSet = _currentPage - _currentPerPage;
                         setState(() {
-                          _currentPage =
-                              _currentPage >= 2 ? _currentPage - 1 : 1;
+                          _currentPage = _nextSet > 1 ? _nextSet : 1;
                         });
                       },
                       padding: EdgeInsets.symmetric(horizontal: 15),
@@ -316,8 +355,10 @@ class _DataPageState extends State<DataPage> {
                     IconButton(
                       icon: Icon(Icons.arrow_forward_ios, size: 16),
                       onPressed: () {
+                        var _nextSet = _currentPage + _currentPerPage;
+
                         setState(() {
-                          _currentPage++;
+                          _currentPage = _nextSet < _total ? _nextSet : _total;
                         });
                       },
                       padding: EdgeInsets.symmetric(horizontal: 15),
@@ -326,15 +367,13 @@ class _DataPageState extends State<DataPage> {
                 ),
               ),
             ),
-          ] 
-        )
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _initData();
-        },
-        child: Icon(Icons.add),
-      ),
+          ])),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     _initData();
+      //   },
+      //   child: Icon(Icons.add),
+      // ),
     );
   }
 }

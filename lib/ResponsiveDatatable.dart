@@ -20,26 +20,30 @@ class ResponsiveDatatable extends StatefulWidget {
   final bool isLoading;
   final bool autoHeight;
   final bool hideUnderline;
+  final List<bool> expanded;
+  final Function dropContainer;
 
-  const ResponsiveDatatable({
-    Key key,
-    this.showSelect: false,
-    this.onSelectAll,
-    this.onSelect,
-    this.onTabRow,
-    this.onSort,
-    this.headers,
-    this.source,
-    this.selecteds,
-    this.title,
-    this.actions,
-    this.footers,
-    this.sortColumn,
-    this.sortAscending,
-    this.isLoading: false,
-    this.autoHeight: true,
-    this.hideUnderline: true,
-  }) : super(key: key);
+  const ResponsiveDatatable(
+      {Key key,
+      this.showSelect: false,
+      this.onSelectAll,
+      this.onSelect,
+      this.onTabRow,
+      this.onSort,
+      this.headers,
+      this.source,
+      this.selecteds,
+      this.title,
+      this.actions,
+      this.footers,
+      this.sortColumn,
+      this.sortAscending,
+      this.isLoading: false,
+      this.autoHeight: true,
+      this.hideUnderline: true,
+      this.expanded,
+      this.dropContainer})
+      : super(key: key);
 
   @override
   _ResponsiveDatatableState createState() => _ResponsiveDatatableState();
@@ -232,51 +236,71 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
     List<Widget> widgets = [];
     for (var index = 0; index < widget.source.length; index++) {
       final data = widget.source[index];
-      widgets.add(InkWell(
-        onTap: widget.onTabRow != null
-            ? () {
-                widget.onTabRow(data);
-              }
-            : null,
-        child: Container(
-            padding: EdgeInsets.all(widget.showSelect ? 0 : 11),
-            decoration: BoxDecoration(
-                border: Border(
-                    bottom: BorderSide(color: Colors.grey[300], width: 1))),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (widget.showSelect && widget.selecteds != null)
-                  Checkbox(
-                      value: widget.selecteds.indexOf(data) >= 0,
-                      onChanged: (value) {
-                        if (widget.onSelect != null)
-                          widget.onSelect(value, data);
-                      }),
-                ...widget.headers
-                    .where((header) => header.show == true)
-                    .map(
-                      (header) => Expanded(
-                        flex: header.flex ?? 1,
-                        child: header.sourceBuilder != null
-                            ? header.sourceBuilder(data[header.value], data)
-                            : header.editable
-                                ? editAbleWidget(
-                                    data: data,
-                                    header: header,
-                                    textAlign: header.textAlign,
-                                  )
-                                : Container(
-                                    child: Text(
-                                      "${data[header.value]}",
+      widgets.add(Column(
+        children: [
+          InkWell(
+            onTap: () {
+              widget.onTabRow != null
+                  ? widget.onTabRow(data): null;
+              setState(() {
+                widget.expanded[index] = !widget.expanded[index];
+              });
+            },
+            child: Container(
+              padding: EdgeInsets.all(widget.showSelect ? 0 : 11),
+              decoration: BoxDecoration(
+                  border: Border(
+                      bottom: BorderSide(color: Colors.grey[300], width: 1))),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (widget.showSelect && widget.selecteds != null)
+                    Row(
+                      children: [
+                        Checkbox(
+                            value: widget.selecteds.indexOf(data) >= 0,
+                            onChanged: (value) {
+                              if (widget.onSelect != null)
+                                widget.onSelect(value, data);
+                            }),
+                        // RaisedButton(onPressed: (){
+                        //   setState(() {
+                        //     widget.expanded[widget.selecteds.indexOf(data)] = true;
+                        //   });
+                        // },
+                        // child: Text("Drop"),)
+                      ],
+                    ),
+                  ...widget.headers
+                      .where((header) => header.show == true)
+                      .map(
+                        (header) => Expanded(
+                          flex: header.flex ?? 1,
+                          child: header.sourceBuilder != null
+                              ? header.sourceBuilder(data[header.value], data)
+                              : header.editable
+                                  ? editAbleWidget(
+                                      data: data,
+                                      header: header,
                                       textAlign: header.textAlign,
+                                    )
+                                  : Container(
+                                      child: Text(
+                                        "${data[header.value]}",
+                                        textAlign: header.textAlign,
+                                      ),
                                     ),
-                                  ),
-                      ),
-                    )
-                    .toList()
-              ],
-            )),
+                        ),
+                      )
+                      .toList()
+                ],
+              ),
+            ),
+          ),
+          widget.expanded[index]
+              ? widget.dropContainer(data)
+              : Container()
+        ],
       ));
     }
     return widgets;
@@ -340,8 +364,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                     children: [
                       if (widget.showSelect && widget.selecteds != null)
                         mobileHeader(),
-                      if (widget.isLoading)
-                        LinearProgressIndicator(),
+                      if (widget.isLoading) LinearProgressIndicator(),
                       //mobileList
                       ...mobileList(),
                     ],
@@ -354,8 +377,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                         children: [
                           if (widget.showSelect && widget.selecteds != null)
                             mobileHeader(),
-                          if (widget.isLoading)
-                            LinearProgressIndicator(),
+                          if (widget.isLoading) LinearProgressIndicator(),
                           //mobileList
                           ...mobileList(),
                         ],
@@ -399,11 +421,9 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                 if (widget.headers != null && widget.headers.isNotEmpty)
                   desktopHeader(),
 
-                if (widget.isLoading)
-                  LinearProgressIndicator(),
+                if (widget.isLoading) LinearProgressIndicator(),
 
-                if (widget.autoHeight)
-                  Column(children: desktopList()),
+                if (widget.autoHeight) Column(children: desktopList()),
 
                 if (!widget.autoHeight)
                   // desktopList
