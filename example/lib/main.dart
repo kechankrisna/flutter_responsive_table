@@ -329,12 +329,12 @@ class _DataPageState extends State<DataPage> {
           ] 
         )
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _initData();
-        },
-        child: Icon(Icons.add),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     _initData();
+      //   },
+      //   child: Icon(Icons.add),
+      // ),
     );
   }
 }
