@@ -199,7 +199,7 @@ class _DataPageState extends State<DataPage> {
     setState(() => _isLoading = true);
     Future.delayed(Duration(seconds: 3)).then((value) {
       _sourceOriginal.clear();
-      _sourceOriginal.addAll(_generateData(n: random.nextInt(1000)));
+      _sourceOriginal.addAll(_generateData(n: random.nextInt(100)));
       _total = _sourceOriginal.length;
       _source = _sourceOriginal.getRange(0, _currentPerPage).toList();
       setState(() => _isLoading = false);
@@ -208,13 +208,13 @@ class _DataPageState extends State<DataPage> {
 
   _resetData({start: 0}) async {
     setState(() => _isLoading = true);
-
+    var _expanded_len = _total-start < _currentPerPage?_total-start:_currentPerPage;
     Future.delayed(Duration(seconds: 0)).then((value) {
-      _expanded = List.generate(_currentPerPage, (index) => false);
+      _expanded = List.generate(_expanded_len, (index) => false);
       _source.clear();
       _source = _sourceOriginal
           .getRange(
-              start, start + _currentPerPage)
+              start, start + _expanded_len)
           .toList();
       setState(() => _isLoading = false);
     });
@@ -348,6 +348,7 @@ class _DataPageState extends State<DataPage> {
                             onChanged: (value) {
                               setState(() {
                                 _currentPerPage = value;
+                                _currentPage = 1;
                                 _resetData();
                               });
                             }),
@@ -362,7 +363,7 @@ class _DataPageState extends State<DataPage> {
                         Icons.arrow_back_ios,
                         size: 16,
                       ),
-                      onPressed: () {
+                      onPressed: _currentPage == 1?null: () {
                         var _nextSet = _currentPage - _currentPerPage;
                         setState(() {
                           _currentPage = _nextSet > 1 ? _nextSet : 1;
@@ -373,12 +374,12 @@ class _DataPageState extends State<DataPage> {
                     ),
                     IconButton(
                       icon: Icon(Icons.arrow_forward_ios, size: 16),
-                      onPressed: () {
+                      onPressed: _currentPage+_currentPerPage-1 > _total?null:() {
                         var _nextSet = _currentPage + _currentPerPage;
 
                         setState(() {
-                          _currentPage = _nextSet < _total ? _nextSet : _total;
-                          _resetData(start: _currentPage - 1);
+                          _currentPage = _nextSet  < _total ? _nextSet : _total-_currentPerPage;
+                          _resetData(start: _nextSet - 1);
                         });
                       },
                       padding: EdgeInsets.symmetric(horizontal: 15),
