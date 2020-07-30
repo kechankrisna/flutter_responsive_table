@@ -173,7 +173,7 @@ class _DataPageState extends State<DataPage> {
         "sku": "$i\000$i",
         "name": "Product $i",
         "category": "Category-$i",
-        "price": "${i}0.00",
+        "price": i*10.00,
         "cost": "20.00",
         "margin": "${i}0.20",
         "in_stock": "${i}0",
