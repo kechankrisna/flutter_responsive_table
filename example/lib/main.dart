@@ -139,7 +139,7 @@ class _DataPageState extends State<DataPage> {
         //   )),
 
         // ],
-        children:_children,
+        children: _children,
       ),
     );
   }
@@ -147,10 +147,11 @@ class _DataPageState extends State<DataPage> {
   List<int> _perPages = [10, 20, 50, 100];
   int _total = 100;
   int _currentPerPage = 10;
-  List<bool> _expanded; // = List.generate(10, (index) => false);
+  List<bool> _expanded;
 
   int _currentPage = 1;
   bool _isSearch = false;
+  List<Map<String, dynamic>> _sourceOriginal = List<Map<String, dynamic>>();
   List<Map<String, dynamic>> _source = List<Map<String, dynamic>>();
   List<Map<String, dynamic>> _selecteds = List<Map<String, dynamic>>();
   String _selectableKey = "id";
@@ -159,17 +160,18 @@ class _DataPageState extends State<DataPage> {
   bool _sortAscending = true;
   bool _isLoading = true;
   bool _showSelect = true;
+  var random = new Random();
 
   List<Map<String, dynamic>> _generateData({int n: 100}) {
     final List source = List.filled(n, Random.secure());
     List<Map<String, dynamic>> temps = List<Map<String, dynamic>>();
-    var i = _source.length;
+    var i = 1;
     print(i);
     for (var data in source) {
       temps.add({
         "id": i,
         "sku": "$i\000$i",
-        "name": "Product Product Product Product $i",
+        "name": "Product $i",
         "category": "Category-$i",
         "price": "${i}0.00",
         "cost": "20.00",
@@ -184,22 +186,36 @@ class _DataPageState extends State<DataPage> {
   }
 
   _initData() async {
+    _mockPullData();
+  }
+
+  _refrshData() async {
+    _mockPullData();
+  }
+
+  _mockPullData() async {
     _expanded = List.generate(_currentPerPage, (index) => false);
 
     setState(() => _isLoading = true);
     Future.delayed(Duration(seconds: 3)).then((value) {
-      _source.addAll(_generateData(n: 10)); //1000
+      _sourceOriginal.clear();
+      _sourceOriginal.addAll(_generateData(n: random.nextInt(1000)));
+      _total = _sourceOriginal.length;
+      _source = _sourceOriginal.getRange(0, _currentPerPage).toList();
       setState(() => _isLoading = false);
     });
   }
 
-  _resetData() async {
+  _resetData({start: 0}) async {
     setState(() => _isLoading = true);
-    Future.delayed(Duration(seconds: 3)).then((value) {
-      _expanded = List.generate(_currentPerPage, (index) => false);
 
+    Future.delayed(Duration(seconds: 0)).then((value) {
+      _expanded = List.generate(_currentPerPage, (index) => false);
       _source.clear();
-      _source.addAll(_generateData(n: _currentPerPage)); //1000
+      _source = _sourceOriginal
+          .getRange(
+              start, start + _currentPerPage)
+          .toList();
       setState(() => _isLoading = false);
     });
   }
@@ -221,9 +237,11 @@ class _DataPageState extends State<DataPage> {
       appBar: AppBar(
         title: Text("DATA TABLE"),
         actions: [
-          // RaisedButton(onPressed: (){
-          //   print(_source);
-          // }, child: Text("SHOW")),
+          IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: () {
+                _refrshData();
+              })
         ],
       ),
 
@@ -348,6 +366,7 @@ class _DataPageState extends State<DataPage> {
                         var _nextSet = _currentPage - _currentPerPage;
                         setState(() {
                           _currentPage = _nextSet > 1 ? _nextSet : 1;
+                          _resetData(start: _currentPage - 1);
                         });
                       },
                       padding: EdgeInsets.symmetric(horizontal: 15),
@@ -359,6 +378,7 @@ class _DataPageState extends State<DataPage> {
 
                         setState(() {
                           _currentPage = _nextSet < _total ? _nextSet : _total;
+                          _resetData(start: _currentPage - 1);
                         });
                       },
                       padding: EdgeInsets.symmetric(horizontal: 15),
