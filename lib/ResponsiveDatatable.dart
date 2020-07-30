@@ -21,6 +21,7 @@ class ResponsiveDatatable extends StatefulWidget {
   final bool autoHeight;
   final bool hideUnderline;
   final bool commonMobileView;
+  final bool isExpandRows;
   final List<bool> expanded;
   final Function dropContainer;
 
@@ -43,6 +44,7 @@ class ResponsiveDatatable extends StatefulWidget {
       this.autoHeight: true,
       this.hideUnderline: true,
       this.commonMobileView: false,
+      this.isExpandRows:true,
       this.expanded,
       this.dropContainer})
       : super(key: key);
@@ -300,7 +302,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
               ),
             ),
           ),
-          if(widget.expanded[index])widget.dropContainer(data)
+          if(widget.isExpandRows && widget.expanded[index])widget.dropContainer(data)
         ],
       ));
     }
