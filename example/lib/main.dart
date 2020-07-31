@@ -337,9 +337,11 @@ class _DataPageState extends State<DataPage> {
                         _sourceFiltered.sort((a, b) =>
                             a["$_sortColumn"].compareTo(b["$_sortColumn"]));
                       }
+                      var _range_top = _currentPerPage<_sourceFiltered.length?_currentPerPage:_sourceFiltered.length;
                       _source =
-                          _sourceFiltered.getRange(0, _currentPerPage).toList();
+                          _sourceFiltered.getRange(0, _range_top).toList();
                       _searchKey = value;
+                      
                       _isLoading = false;
                     });
                   },
