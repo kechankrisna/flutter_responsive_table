@@ -46,9 +46,9 @@ class _DataPageState extends State<DataPage> {
     DatatableHeader(
         text: "ID",
         value: "id",
-        show: false,
+        show: true,
         sortable: true,
-        textAlign: TextAlign.right),
+        textAlign: TextAlign.center),
     DatatableHeader(
         text: "Name",
         value: "name",
@@ -148,10 +148,12 @@ class _DataPageState extends State<DataPage> {
   int _total = 100;
   int _currentPerPage = 10;
   List<bool> _expanded;
+  String _searchKey = "id";
 
   int _currentPage = 1;
   bool _isSearch = false;
   List<Map<String, dynamic>> _sourceOriginal = List<Map<String, dynamic>>();
+  List<Map<String, dynamic>> _sourceFiltered = List<Map<String, dynamic>>();
   List<Map<String, dynamic>> _source = List<Map<String, dynamic>>();
   List<Map<String, dynamic>> _selecteds = List<Map<String, dynamic>>();
   String _selectableKey = "id";
@@ -173,7 +175,7 @@ class _DataPageState extends State<DataPage> {
         "sku": "$i\000$i",
         "name": "Product $i",
         "category": "Category-$i",
-        "price": i*10.00,
+        "price": i * 10.00,
         "cost": "20.00",
         "margin": "${i}0.20",
         "in_stock": "${i}0",
@@ -189,10 +191,6 @@ class _DataPageState extends State<DataPage> {
     _mockPullData();
   }
 
-  _refrshData() async {
-    _mockPullData();
-  }
-
   _mockPullData() async {
     _expanded = List.generate(_currentPerPage, (index) => false);
 
@@ -200,8 +198,9 @@ class _DataPageState extends State<DataPage> {
     Future.delayed(Duration(seconds: 3)).then((value) {
       _sourceOriginal.clear();
       _sourceOriginal.addAll(_generateData(n: random.nextInt(10000)));
-      _total = _sourceOriginal.length;
-      _source = _sourceOriginal.getRange(0, _currentPerPage).toList();
+      _sourceFiltered = _sourceOriginal;
+      _total = _sourceFiltered.length;
+      _source = _sourceFiltered.getRange(0, _currentPerPage).toList();
       setState(() => _isLoading = false);
     });
   }
@@ -213,9 +212,34 @@ class _DataPageState extends State<DataPage> {
     Future.delayed(Duration(seconds: 0)).then((value) {
       _expanded = List.generate(_expanded_len, (index) => false);
       _source.clear();
-      _source = _sourceOriginal.getRange(start, start + _expanded_len).toList();
+      _source = _sourceFiltered.getRange(start, start + _expanded_len).toList();
       setState(() => _isLoading = false);
     });
+  }
+
+  _filterData(value) {
+    setState(() => _isLoading = true);
+
+    try {
+      if (value == "" || value == null) {
+        _sourceFiltered = _sourceOriginal;
+      } else {
+        _sourceFiltered = _sourceOriginal
+            .where((data) => data[_searchKey]
+                .toString()
+                .toLowerCase()
+                .contains(value.toString().toLowerCase()))
+            .toList();
+      }
+
+      _total = _sourceFiltered.length;
+      var _rangeTop = _total < _currentPerPage ? _total : _currentPerPage;
+      _expanded = List.generate(_rangeTop, (index) => false);
+      _source = _sourceFiltered.getRange(0, _rangeTop).toList();
+    } catch (e) {
+      print(e);
+    }
+    setState(() => _isLoading = false);
   }
 
   @override
@@ -238,7 +262,7 @@ class _DataPageState extends State<DataPage> {
           IconButton(
               icon: Icon(Icons.refresh),
               onPressed: () {
-                _refrshData();
+                _initData();
               })
         ],
       ),
@@ -265,6 +289,10 @@ class _DataPageState extends State<DataPage> {
                       Expanded(
                           child: TextField(
                         decoration: InputDecoration(
+                            hintText: 'Enter search term based on ' +
+                                _searchKey
+                                    .replaceAll(new RegExp('[\\W_]+'), ' ')
+                                    .toUpperCase(),
                             prefixIcon: IconButton(
                                 icon: Icon(Icons.cancel),
                                 onPressed: () {
@@ -274,6 +302,9 @@ class _DataPageState extends State<DataPage> {
                                 }),
                             suffixIcon: IconButton(
                                 icon: Icon(Icons.search), onPressed: () {})),
+                        onSubmitted: (value) {
+                          _filterData(value);
+                        },
                       )),
                     if (!_isSearch)
                       IconButton(
@@ -300,14 +331,15 @@ class _DataPageState extends State<DataPage> {
                       _sortColumn = value;
                       _sortAscending = !_sortAscending;
                       if (_sortAscending) {
-                        _sourceOriginal.sort((a, b) =>
+                        _sourceFiltered.sort((a, b) =>
                             b["$_sortColumn"].compareTo(a["$_sortColumn"]));
                       } else {
-                        _sourceOriginal.sort((a, b) =>
+                        _sourceFiltered.sort((a, b) =>
                             a["$_sortColumn"].compareTo(b["$_sortColumn"]));
                       }
                       _source =
-                          _sourceOriginal.getRange(0, _currentPerPage).toList();
+                          _sourceFiltered.getRange(0, _currentPerPage).toList();
+                      _searchKey = value;
                       _isLoading = false;
                     });
                   },
