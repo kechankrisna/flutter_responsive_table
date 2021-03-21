@@ -166,13 +166,10 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
     switch (textAlign) {
       case TextAlign.center:
         return Alignment.center;
-        break;
       case TextAlign.left:
         return Alignment.centerLeft;
-        break;
       case TextAlign.right:
         return Alignment.centerRight;
-        break;
       default:
         return Alignment.center;
     }
@@ -240,8 +237,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
         children: [
           InkWell(
             onTap: () {
-              widget.onTabRow != null
-                  ? widget.onTabRow!(data): null;
+              widget.onTabRow != null ? widget.onTabRow!(data) : null;
               setState(() {
                 widget.expanded![index] = !widget.expanded![index];
               });

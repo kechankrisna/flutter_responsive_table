@@ -151,9 +151,9 @@ class _DataPageState extends State<DataPage> {
 
   int _currentPage = 1;
   bool _isSearch = false;
-  List<Map<String, dynamic>> _source = List<Map<String, dynamic>>();
-  List<Map<String, dynamic>> _selecteds = List<Map<String, dynamic>>();
-  String _selectableKey = "id";
+  List<Map<String, dynamic>> _source = <Map<String, dynamic>>[];
+  List<Map<String, dynamic>> _selecteds = <Map<String, dynamic>>[];
+  //String _selectableKey = "id";
 
   String _sortColumn;
   bool _sortAscending = true;
@@ -162,10 +162,11 @@ class _DataPageState extends State<DataPage> {
 
   List<Map<String, dynamic>> _generateData({int n: 100}) {
     final List source = List.filled(n, Random.secure());
-    List<Map<String, dynamic>> temps = List<Map<String, dynamic>>();
+    List<Map<String, dynamic>> temps = <Map<String, dynamic>>[];
     var i = _source.length;
     print(i);
-    for (var data in source) {
+    for (int j = 0; j < source.length; j++) {
+      //var data = source[j];
       temps.add({
         "id": i,
         "sku": "$i\000$i",
