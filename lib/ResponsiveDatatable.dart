@@ -229,9 +229,9 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
             onTap: () {
               if (widget.onTabRow != null) widget.onTabRow!(data);
               if (widget.expanded != null)
-              setState(() {
-                widget.expanded![index] = !widget.expanded![index];
-              });
+                setState(() {
+                  widget.expanded![index] = !widget.expanded![index];
+                });
             },
             child: Container(
               padding: EdgeInsets.all(widget.showSelect ? 0 : 11),
