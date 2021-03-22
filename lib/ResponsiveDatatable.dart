@@ -22,8 +22,12 @@ class ResponsiveDatatable extends StatefulWidget {
   final bool hideUnderline;
   final List<bool>? expanded;
   final Function? dropContainer;
-
-  const ResponsiveDatatable(
+  final ScrollController desktopScrollController;
+  final Color desktopHeaderTopBorderColor;
+  final Color headerBorderColor;
+  final Color rowBorderDarkColor;
+  final Color rowBorderLightColor;
+  ResponsiveDatatable(
       {Key? key,
       this.showSelect: false,
       this.onSelectAll,
@@ -42,14 +46,24 @@ class ResponsiveDatatable extends StatefulWidget {
       this.autoHeight: true,
       this.hideUnderline: true,
       this.expanded,
-      this.dropContainer})
-      : super(key: key);
+      this.dropContainer,
+    this.desktopHeaderTopBorderColor: Colors.transparent,
+    this.headerBorderColor: Colors.grey,
+    Color? rowBorderDarkColor,
+    Color? rowBorderLightColor,
+    ScrollController? desktopScrollController,
+  })  : this.rowBorderDarkColor = rowBorderDarkColor ?? Colors.grey[800]!,
+        this.rowBorderLightColor = rowBorderLightColor ?? Colors.grey[300]!,
+        this.desktopScrollController = desktopScrollController ?? ScrollController(),
+        super(key: key);
 
   @override
   _ResponsiveDatatableState createState() => _ResponsiveDatatableState();
 }
 
 class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
+  
+
   Widget mobileHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -103,7 +117,13 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
               }
             : null,
         child: Container(
-          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[300]!, width: 1))),
+          decoration: BoxDecoration(
+              border: Border(
+                  bottom: BorderSide(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? widget.rowBorderDarkColor
+                          : widget.rowBorderLightColor,
+                      width: 1))),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -171,7 +191,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
 
   Widget desktopHeader() {
     return Container(
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[300]!, width: 1))),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: widget.headerBorderColor, width: 1))),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -235,7 +255,13 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
             },
             child: Container(
               padding: EdgeInsets.all(widget.showSelect ? 0 : 11),
-              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[300]!, width: 1))),
+              decoration: BoxDecoration(
+                  border: Border(
+                      bottom: BorderSide(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? widget.rowBorderDarkColor
+                              : widget.rowBorderLightColor,
+                          width: 1))),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -327,7 +353,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                 if (widget.title != null || widget.actions != null)
                   Container(
                     padding: EdgeInsets.all(5),
-                    decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[300]!))),
+                    decoration: BoxDecoration(border: Border(bottom: BorderSide(color: widget.headerBorderColor))),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -381,7 +407,8 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                 if (widget.title != null || widget.actions != null)
                   Container(
                     padding: EdgeInsets.all(5),
-                    decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[300]!))),
+                    decoration:
+                        BoxDecoration(border: Border(bottom: BorderSide(color: widget.desktopHeaderTopBorderColor))),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -401,7 +428,20 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                 if (!widget.autoHeight)
                   // desktopList
                   if (widget.source != null && widget.source!.isNotEmpty)
-                    Expanded(child: Container(child: ListView(children: desktopList()))),
+                    Expanded(
+                      child: Container(
+                        child: Scrollbar(
+                          controller: widget.desktopScrollController,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 10.0),
+                            child: ListView(
+                              controller: widget.desktopScrollController,
+                              children: desktopList(),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
 
                 //footer
                 if (widget.footers != null)
