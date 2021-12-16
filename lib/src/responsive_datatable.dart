@@ -23,30 +23,36 @@ class ResponsiveDatatable extends StatefulWidget {
   final bool isExpandRows;
   final List<bool> expanded;
   final Function dropContainer;
+  final List<ScreenSize> reponseScreenSizes;
 
-  const ResponsiveDatatable(
-      {Key key,
-      this.showSelect: false,
-      this.onSelectAll,
-      this.onSelect,
-      this.onTabRow,
-      this.onSort,
-      this.headers,
-      this.source,
-      this.selecteds,
-      this.title,
-      this.actions,
-      this.footers,
-      this.sortColumn,
-      this.sortAscending,
-      this.isLoading: false,
-      this.autoHeight: true,
-      this.hideUnderline: true,
-      this.commonMobileView: false,
-      this.isExpandRows: true,
-      this.expanded,
-      this.dropContainer})
-      : super(key: key);
+  const ResponsiveDatatable({
+    Key key,
+    this.showSelect: false,
+    this.onSelectAll,
+    this.onSelect,
+    this.onTabRow,
+    this.onSort,
+    this.headers,
+    this.source,
+    this.selecteds,
+    this.title,
+    this.actions,
+    this.footers,
+    this.sortColumn,
+    this.sortAscending,
+    this.isLoading: false,
+    this.autoHeight: true,
+    this.hideUnderline: true,
+    this.commonMobileView: false,
+    this.isExpandRows: true,
+    this.expanded,
+    this.dropContainer,
+    this.reponseScreenSizes = const [
+      ScreenSize.Xs,
+      ScreenSize.Sm,
+      ScreenSize.Md
+    ],
+  }) : super(key: key);
 
   @override
   _ResponsiveDatatableState createState() => _ResponsiveDatatableState();
@@ -339,8 +345,8 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
 
   @override
   Widget build(BuildContext context) {
-    return [ScreenSize.Xs, ScreenSize.Sm, ScreenSize.Md]
-            .contains(context.screenSize)
+    return widget.reponseScreenSizes.isNotEmpty &&
+            widget.reponseScreenSizes.contains(context.screenSize)
         ?
         /**
          * for small screen

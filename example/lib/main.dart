@@ -286,6 +286,7 @@ class _DataPageState extends State<DataPage> {
                 clipBehavior: Clip.none,
                 child: ResponsiveDatatable(
                   title: null,
+                  reponseScreenSizes: [ScreenSize.Xs],
                   actions: [
                     if (_isSearch)
                       Expanded(
@@ -339,11 +340,12 @@ class _DataPageState extends State<DataPage> {
                         _sourceFiltered.sort((a, b) =>
                             a["$_sortColumn"].compareTo(b["$_sortColumn"]));
                       }
-                      var _rangeTop = _currentPerPage<_sourceFiltered.length?_currentPerPage:_sourceFiltered.length;
-                      _source =
-                          _sourceFiltered.getRange(0, _rangeTop).toList();
+                      var _rangeTop = _currentPerPage < _sourceFiltered.length
+                          ? _currentPerPage
+                          : _sourceFiltered.length;
+                      _source = _sourceFiltered.getRange(0, _rangeTop).toList();
                       _searchKey = value;
-                      
+
                       _isLoading = false;
                     });
                   },
