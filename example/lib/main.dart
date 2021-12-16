@@ -152,10 +152,11 @@ class _DataPageState extends State<DataPage> {
 
   int _currentPage = 1;
   bool _isSearch = false;
-  List<Map<String, dynamic>> _sourceOriginal = List<Map<String, dynamic>>();
-  List<Map<String, dynamic>> _sourceFiltered = List<Map<String, dynamic>>();
-  List<Map<String, dynamic>> _source = List<Map<String, dynamic>>();
-  List<Map<String, dynamic>> _selecteds = List<Map<String, dynamic>>();
+  List<Map<String, dynamic>> _sourceOriginal = [];
+  List<Map<String, dynamic>> _sourceFiltered = [];
+  List<Map<String, dynamic>> _source = [];
+  List<Map<String, dynamic>> _selecteds = [];
+  // ignore: unused_field
   String _selectableKey = "id";
 
   String _sortColumn;
@@ -166,9 +167,10 @@ class _DataPageState extends State<DataPage> {
 
   List<Map<String, dynamic>> _generateData({int n: 100}) {
     final List source = List.filled(n, Random.secure());
-    List<Map<String, dynamic>> temps = List<Map<String, dynamic>>();
+    List<Map<String, dynamic>> temps = [];
     var i = 1;
     print(i);
+    // ignore: unused_local_variable
     for (var data in source) {
       temps.add({
         "id": i,
@@ -207,12 +209,12 @@ class _DataPageState extends State<DataPage> {
 
   _resetData({start: 0}) async {
     setState(() => _isLoading = true);
-    var _expanded_len =
+    var _expandedLen =
         _total - start < _currentPerPage ? _total - start : _currentPerPage;
     Future.delayed(Duration(seconds: 0)).then((value) {
-      _expanded = List.generate(_expanded_len, (index) => false);
+      _expanded = List.generate(_expandedLen, (index) => false);
       _source.clear();
-      _source = _sourceFiltered.getRange(start, start + _expanded_len).toList();
+      _source = _sourceFiltered.getRange(start, start + _expandedLen).toList();
       setState(() => _isLoading = false);
     });
   }
@@ -337,9 +339,9 @@ class _DataPageState extends State<DataPage> {
                         _sourceFiltered.sort((a, b) =>
                             a["$_sortColumn"].compareTo(b["$_sortColumn"]));
                       }
-                      var _range_top = _currentPerPage<_sourceFiltered.length?_currentPerPage:_sourceFiltered.length;
+                      var _rangeTop = _currentPerPage<_sourceFiltered.length?_currentPerPage:_sourceFiltered.length;
                       _source =
-                          _sourceFiltered.getRange(0, _range_top).toList();
+                          _sourceFiltered.getRange(0, _rangeTop).toList();
                       _searchKey = value;
                       
                       _isLoading = false;

@@ -1,3 +1,7 @@
+# 0.2.0
+
+* null safety
+
 # 0.1.1+8
 
 * fixed the update

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_context/responsive_context.dart';
+import 'package:responsive_table/widget_parsing.dart';
 
 import 'DatatableHeader.dart';
 
@@ -44,7 +44,7 @@ class ResponsiveDatatable extends StatefulWidget {
       this.autoHeight: true,
       this.hideUnderline: true,
       this.commonMobileView: false,
-      this.isExpandRows:true,
+      this.isExpandRows: true,
       this.expanded,
       this.dropContainer})
       : super(key: key);
@@ -129,37 +129,38 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                         }),
                 ],
               ),
-              if(widget.commonMobileView)widget.dropContainer(data),
-              if(!widget.commonMobileView)...widget.headers
-                  .where((header) => header.show == true)
-                  .toList()
-                  .map(
-                    (header) => Container(
-                      padding: EdgeInsets.all(11),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          header.headerBuilder != null
-                              ? header.headerBuilder(header.value)
-                              : Text(
-                                  "${header.text}",
-                                  overflow: TextOverflow.clip,
-                                ),
-                          Spacer(),
-                          header.sourceBuilder != null
-                              ? header.sourceBuilder(data[header.value], data)
-                              : header.editable
-                                  ? editAbleWidget(
-                                      data: data,
-                                      header: header,
-                                      textAlign: TextAlign.end,
-                                    )
-                                  : Text("${data[header.value]}")
-                        ],
+              if (widget.commonMobileView) widget.dropContainer(data),
+              if (!widget.commonMobileView)
+                ...widget.headers
+                    .where((header) => header.show == true)
+                    .toList()
+                    .map(
+                      (header) => Container(
+                        padding: EdgeInsets.all(11),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            header.headerBuilder != null
+                                ? header.headerBuilder(header.value)
+                                : Text(
+                                    "${header.text}",
+                                    overflow: TextOverflow.clip,
+                                  ),
+                            Spacer(),
+                            header.sourceBuilder != null
+                                ? header.sourceBuilder(data[header.value], data)
+                                : header.editable
+                                    ? editAbleWidget(
+                                        data: data,
+                                        header: header,
+                                        textAlign: TextAlign.end,
+                                      )
+                                    : Text("${data[header.value]}")
+                          ],
+                        ),
                       ),
-                    ),
-                  )
-                  .toList()
+                    )
+                    .toList()
             ],
           ),
         ),
@@ -245,8 +246,9 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
         children: [
           InkWell(
             onTap: () {
-              widget.onTabRow != null
-                  ? widget.onTabRow(data): null;
+              if (widget.onTabRow != null) {
+                widget.onTabRow(data);
+              }
               setState(() {
                 widget.expanded[index] = !widget.expanded[index];
               });
@@ -302,7 +304,8 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
               ),
             ),
           ),
-          if(widget.isExpandRows && widget.expanded[index])widget.dropContainer(data)
+          if (widget.isExpandRows && widget.expanded[index])
+            widget.dropContainer(data)
         ],
       ));
     }
@@ -337,7 +340,8 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
 
   @override
   Widget build(BuildContext context) {
-    return context.isExtraSmall || context.isSmall || context.isMedium
+    return [ScreenSize.Xs, ScreenSize.Sm, ScreenSize.Md]
+            .contains(context.screenSize)
         ?
         /**
          * for small screen
