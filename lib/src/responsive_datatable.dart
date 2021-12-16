@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_table/widget_parsing.dart';
-
-import 'DatatableHeader.dart';
+import 'widget_parsing.dart';
+import 'datatable_header.dart';
 
 class ResponsiveDatatable extends StatefulWidget {
   final bool showSelect;
