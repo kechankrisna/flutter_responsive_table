@@ -9,10 +9,10 @@ import 'package:flutter/services.dart';
 
 class FlutterResponsiveTable {
   static const MethodChannel _channel =
-      const MethodChannel('flutter_responsive_table');
+      MethodChannel('flutter_responsive_table');
 
-  static Future<String> get platformVersion async {
-    final String version = await _channel.invokeMethod('getPlatformVersion');
+  static Future<String?> get platformVersion async {
+    final String? version = await _channel.invokeMethod('getPlatformVersion');
     return version;
   }
 }

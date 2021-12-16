@@ -36,7 +36,7 @@ class _DataPickerPageState extends State<DataPickerPage> {
 }
 
 class DataPage extends StatefulWidget {
-  DataPage({Key key}) : super(key: key);
+  DataPage({Key? key}) : super(key: key);
   @override
   _DataPageState createState() => _DataPageState();
 }
@@ -146,20 +146,20 @@ class _DataPageState extends State<DataPage> {
 
   List<int> _perPages = [10, 20, 50, 100];
   int _total = 100;
-  int _currentPerPage = 10;
-  List<bool> _expanded;
-  String _searchKey = "id";
+  int? _currentPerPage = 10;
+  List<bool>? _expanded;
+  String? _searchKey = "id";
 
   int _currentPage = 1;
   bool _isSearch = false;
   List<Map<String, dynamic>> _sourceOriginal = [];
   List<Map<String, dynamic>> _sourceFiltered = [];
   List<Map<String, dynamic>> _source = [];
-  List<Map<String, dynamic>> _selecteds = [];
+  List<Map<String?, dynamic>> _selecteds = [];
   // ignore: unused_field
   String _selectableKey = "id";
 
-  String _sortColumn;
+  String? _sortColumn;
   bool _sortAscending = true;
   bool _isLoading = true;
   bool _showSelect = true;
@@ -194,7 +194,7 @@ class _DataPageState extends State<DataPage> {
   }
 
   _mockPullData() async {
-    _expanded = List.generate(_currentPerPage, (index) => false);
+    _expanded = List.generate(_currentPerPage!, (index) => false);
 
     setState(() => _isLoading = true);
     Future.delayed(Duration(seconds: 3)).then((value) {
@@ -202,7 +202,7 @@ class _DataPageState extends State<DataPage> {
       _sourceOriginal.addAll(_generateData(n: random.nextInt(10000)));
       _sourceFiltered = _sourceOriginal;
       _total = _sourceFiltered.length;
-      _source = _sourceFiltered.getRange(0, _currentPerPage).toList();
+      _source = _sourceFiltered.getRange(0, _currentPerPage!).toList();
       setState(() => _isLoading = false);
     });
   }
@@ -210,9 +210,9 @@ class _DataPageState extends State<DataPage> {
   _resetData({start: 0}) async {
     setState(() => _isLoading = true);
     var _expandedLen =
-        _total - start < _currentPerPage ? _total - start : _currentPerPage;
+        _total - start < _currentPerPage! ? _total - start : _currentPerPage;
     Future.delayed(Duration(seconds: 0)).then((value) {
-      _expanded = List.generate(_expandedLen, (index) => false);
+      _expanded = List.generate(_expandedLen as int, (index) => false);
       _source.clear();
       _source = _sourceFiltered.getRange(start, start + _expandedLen).toList();
       setState(() => _isLoading = false);
@@ -227,7 +227,7 @@ class _DataPageState extends State<DataPage> {
         _sourceFiltered = _sourceOriginal;
       } else {
         _sourceFiltered = _sourceOriginal
-            .where((data) => data[_searchKey]
+            .where((data) => data[_searchKey!]
                 .toString()
                 .toLowerCase()
                 .contains(value.toString().toLowerCase()))
@@ -235,7 +235,7 @@ class _DataPageState extends State<DataPage> {
       }
 
       _total = _sourceFiltered.length;
-      var _rangeTop = _total < _currentPerPage ? _total : _currentPerPage;
+      var _rangeTop = _total < _currentPerPage! ? _total : _currentPerPage!;
       _expanded = List.generate(_rangeTop, (index) => false);
       _source = _sourceFiltered.getRange(0, _rangeTop).toList();
     } catch (e) {
@@ -293,7 +293,7 @@ class _DataPageState extends State<DataPage> {
                           child: TextField(
                         decoration: InputDecoration(
                             hintText: 'Enter search term based on ' +
-                                _searchKey
+                                _searchKey!
                                     .replaceAll(new RegExp('[\\W_]+'), ' ')
                                     .toUpperCase(),
                             prefixIcon: IconButton(
@@ -340,8 +340,8 @@ class _DataPageState extends State<DataPage> {
                         _sourceFiltered.sort((a, b) =>
                             a["$_sortColumn"].compareTo(b["$_sortColumn"]));
                       }
-                      var _rangeTop = _currentPerPage < _sourceFiltered.length
-                          ? _currentPerPage
+                      var _rangeTop = _currentPerPage! < _sourceFiltered.length
+                          ? _currentPerPage!
                           : _sourceFiltered.length;
                       _source = _sourceFiltered.getRange(0, _rangeTop).toList();
                       _searchKey = value;
@@ -355,7 +355,7 @@ class _DataPageState extends State<DataPage> {
                   isLoading: _isLoading,
                   onSelect: (value, item) {
                     print("$value  $item ");
-                    if (value) {
+                    if (value!) {
                       setState(() => _selecteds.add(item));
                     } else {
                       setState(
@@ -363,7 +363,7 @@ class _DataPageState extends State<DataPage> {
                     }
                   },
                   onSelectAll: (value) {
-                    if (value) {
+                    if (value!) {
                       setState(() => _selecteds =
                           _source.map((entry) => entry).toList().cast());
                     } else {
@@ -375,7 +375,7 @@ class _DataPageState extends State<DataPage> {
                       padding: EdgeInsets.symmetric(horizontal: 15),
                       child: Text("Rows per page:"),
                     ),
-                    if (_perPages != null)
+                    if (_perPages.isNotEmpty)
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 15),
                         child: DropdownButton(
@@ -386,7 +386,7 @@ class _DataPageState extends State<DataPage> {
                                       value: e,
                                     ))
                                 .toList(),
-                            onChanged: (value) {
+                            onChanged: (dynamic value) {
                               setState(() {
                                 _currentPerPage = value;
                                 _currentPage = 1;
@@ -407,7 +407,7 @@ class _DataPageState extends State<DataPage> {
                       onPressed: _currentPage == 1
                           ? null
                           : () {
-                              var _nextSet = _currentPage - _currentPerPage;
+                              var _nextSet = _currentPage - _currentPerPage!;
                               setState(() {
                                 _currentPage = _nextSet > 1 ? _nextSet : 1;
                                 _resetData(start: _currentPage - 1);
@@ -417,15 +417,15 @@ class _DataPageState extends State<DataPage> {
                     ),
                     IconButton(
                       icon: Icon(Icons.arrow_forward_ios, size: 16),
-                      onPressed: _currentPage + _currentPerPage - 1 > _total
+                      onPressed: _currentPage + _currentPerPage! - 1 > _total
                           ? null
                           : () {
-                              var _nextSet = _currentPage + _currentPerPage;
+                              var _nextSet = _currentPage + _currentPerPage!;
 
                               setState(() {
                                 _currentPage = _nextSet < _total
                                     ? _nextSet
-                                    : _total - _currentPerPage;
+                                    : _total - _currentPerPage!;
                                 _resetData(start: _nextSet - 1);
                               });
                             },
