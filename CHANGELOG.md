@@ -1,3 +1,7 @@
+# 0.2.0+1
+
+* update example and split TextEditableWidget
+
 # 0.2.0
 
 * null safety

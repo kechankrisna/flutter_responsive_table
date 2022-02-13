@@ -13,7 +13,7 @@ class DatatableHeader {
       sourceBuilder;
 
   DatatableHeader({
-    required this.text ,
+    required this.text,
     required this.value,
     this.textAlign = TextAlign.center,
     this.sortable = false,
