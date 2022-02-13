@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:responsive_table/responsive_table.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
@@ -42,107 +43,7 @@ class DataPage extends StatefulWidget {
 }
 
 class _DataPageState extends State<DataPage> {
-  List<DatatableHeader> _headers = [
-    DatatableHeader(
-        text: "ID",
-        value: "id",
-        show: true,
-        sortable: true,
-        textAlign: TextAlign.center),
-    DatatableHeader(
-        text: "Name",
-        value: "name",
-        show: true,
-        flex: 2,
-        sortable: true,
-        editable: true,
-        textAlign: TextAlign.left),
-    DatatableHeader(
-        text: "SKU",
-        value: "sku",
-        show: true,
-        sortable: true,
-        textAlign: TextAlign.center),
-    DatatableHeader(
-        text: "Category",
-        value: "category",
-        show: true,
-        sortable: true,
-        textAlign: TextAlign.left),
-    DatatableHeader(
-        text: "Price",
-        value: "price",
-        show: true,
-        sortable: true,
-        textAlign: TextAlign.left),
-    DatatableHeader(
-        text: "Margin",
-        value: "margin",
-        show: true,
-        sortable: true,
-        textAlign: TextAlign.left),
-    DatatableHeader(
-        text: "In Stock",
-        value: "in_stock",
-        show: true,
-        sortable: true,
-        textAlign: TextAlign.left),
-    DatatableHeader(
-        text: "Alert",
-        value: "alert",
-        show: true,
-        sortable: true,
-        textAlign: TextAlign.left),
-    DatatableHeader(
-        text: "Received",
-        value: "received",
-        show: true,
-        sortable: false,
-        sourceBuilder: (value, row) {
-          List list = List.from(value);
-          return Container(
-            child: Column(
-              children: [
-                Container(
-                  width: 85,
-                  child: LinearProgressIndicator(
-                    value: list.first / list.last,
-                  ),
-                ),
-                Text("${list.first} of ${list.last}")
-              ],
-            ),
-          );
-        },
-        textAlign: TextAlign.center),
-  ];
-
-  Widget _dropContainer(data) {
-    List<Widget> _children = data.entries.map<Widget>((entry) {
-      Widget w = Row(
-        children: [
-          Text(entry.key.toString()),
-          Spacer(),
-          Text(entry.value.toString()),
-        ],
-      );
-      return w;
-    }).toList();
-    return Container(
-      // height: 100,
-      child: Column(
-        // children: [
-        //   Expanded(
-        //       child: Container(
-        //     color: Colors.red,
-        //     height: 50,
-        //   )),
-
-        // ],
-        children: _children,
-      ),
-    );
-  }
+  late List<DatatableHeader> _headers;
 
   List<int> _perPages = [10, 20, 50, 100];
   int _total = 100;
@@ -155,7 +56,7 @@ class _DataPageState extends State<DataPage> {
   List<Map<String, dynamic>> _sourceOriginal = [];
   List<Map<String, dynamic>> _sourceFiltered = [];
   List<Map<String, dynamic>> _source = [];
-  List<Map<String?, dynamic>> _selecteds = [];
+  List<Map<String, dynamic>> _selecteds = [];
   // ignore: unused_field
   String _selectableKey = "id";
 
@@ -189,7 +90,7 @@ class _DataPageState extends State<DataPage> {
     return temps;
   }
 
-  _initData() async {
+  _initializeData() async {
     _mockPullData();
   }
 
@@ -247,7 +148,84 @@ class _DataPageState extends State<DataPage> {
   @override
   void initState() {
     super.initState();
-    _initData();
+
+    /// set headers
+    _headers = [
+      DatatableHeader(
+          text: "ID",
+          value: "id",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center),
+      DatatableHeader(
+          text: "Name",
+          value: "name",
+          show: true,
+          flex: 2,
+          sortable: true,
+          editable: true,
+          textAlign: TextAlign.left),
+      DatatableHeader(
+          text: "SKU",
+          value: "sku",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center),
+      DatatableHeader(
+          text: "Category",
+          value: "category",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.left),
+      DatatableHeader(
+          text: "Price",
+          value: "price",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.left),
+      DatatableHeader(
+          text: "Margin",
+          value: "margin",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.left),
+      DatatableHeader(
+          text: "In Stock",
+          value: "in_stock",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.left),
+      DatatableHeader(
+          text: "Alert",
+          value: "alert",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.left),
+      DatatableHeader(
+          text: "Received",
+          value: "received",
+          show: true,
+          sortable: false,
+          sourceBuilder: (value, row) {
+            List list = List.from(value);
+            return Container(
+              child: Column(
+                children: [
+                  Container(
+                    width: 85,
+                    child: LinearProgressIndicator(
+                      value: list.first / list.last,
+                    ),
+                  ),
+                  Text("${list.first} of ${list.last}")
+                ],
+              ),
+            );
+          },
+          textAlign: TextAlign.center),
+    ];
+
+    _initializeData();
   }
 
   @override
@@ -259,12 +237,12 @@ class _DataPageState extends State<DataPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("DATA TABLE"),
+        title: Text("RESPONSIVE DATA TABLE"),
         actions: [
           IconButton(
               icon: Icon(Icons.refresh),
               onPressed: () {
-                _initData();
+                _initializeData();
               })
         ],
       ),
@@ -286,7 +264,7 @@ class _DataPageState extends State<DataPage> {
                 clipBehavior: Clip.none,
                 child: ResponsiveDatatable(
                   title: null,
-                  reponseScreenSizes: [ScreenSize.Xs],
+                  reponseScreenSizes: [ScreenSize.xs],
                   actions: [
                     if (_isSearch)
                       Expanded(
@@ -323,7 +301,20 @@ class _DataPageState extends State<DataPage> {
                   selecteds: _selecteds,
                   showSelect: _showSelect,
                   autoHeight: false,
-                  dropContainer: _dropContainer,
+                  dropContainer: (data) {
+                    if (int.tryParse(data['id'].toString())!.isEven) {
+                      return Text("is Even");
+                    }
+                    return _DropDownContainer(data: data);
+                  },
+                  onChangedRow: (value, header) {
+                    /// print(value);
+                    /// print(header);
+                  },
+                  onSubmittedRow: (value, header) {
+                    /// print(value);
+                    /// print(header);
+                  },
                   onTabRow: (data) {
                     print(data);
                   },
@@ -442,6 +433,40 @@ class _DataPageState extends State<DataPage> {
       //   },
       //   child: Icon(Icons.add),
       // ),
+    );
+  }
+}
+
+class _DropDownContainer extends StatelessWidget {
+  final Map<String, dynamic> data;
+  const _DropDownContainer({Key? key, required this.data}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> _children = data.entries.map<Widget>((entry) {
+      Widget w = Row(
+        children: [
+          Text(entry.key.toString()),
+          Spacer(),
+          Text(entry.value.toString()),
+        ],
+      );
+      return w;
+    }).toList();
+
+    return Container(
+      /// height: 100,
+      child: Column(
+        /// children: [
+        ///   Expanded(
+        ///       child: Container(
+        ///     color: Colors.red,
+        ///     height: 50,
+        ///   )),
+
+        /// ],
+        children: _children,
+      ),
     );
   }
 }

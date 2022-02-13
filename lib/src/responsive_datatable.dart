@@ -5,14 +5,14 @@ import 'datatable_header.dart';
 class ResponsiveDatatable extends StatefulWidget {
   final bool showSelect;
   final List<DatatableHeader>? headers;
-  final List<Map<String?, dynamic>>? source;
-  final List<Map<String?, dynamic>>? selecteds;
+  final List<Map<String, dynamic>>? source;
+  final List<Map<String, dynamic>>? selecteds;
   final Widget? title;
   final List<Widget>? actions;
   final List<Widget>? footers;
   final Function(bool? value)? onSelectAll;
-  final Function(bool? value, Map<String?, dynamic> data)? onSelect;
-  final Function(dynamic value)? onTabRow;
+  final Function(bool? value, Map<String, dynamic> data)? onSelect;
+  final Function(Map<String, dynamic> value)? onTabRow;
   final Function(dynamic value)? onSort;
   final String? sortColumn;
   final bool? sortAscending;
@@ -22,7 +22,11 @@ class ResponsiveDatatable extends StatefulWidget {
   final bool commonMobileView;
   final bool isExpandRows;
   final List<bool>? expanded;
-  final Function? dropContainer;
+  final Widget Function(Map<String, dynamic> value)? dropContainer;
+  final Function(Map<String, dynamic> value, DatatableHeader header)?
+      onChangedRow;
+  final Function(Map<String, dynamic> value, DatatableHeader header)?
+      onSubmittedRow;
   final List<ScreenSize> reponseScreenSizes;
 
   const ResponsiveDatatable({
@@ -47,10 +51,12 @@ class ResponsiveDatatable extends StatefulWidget {
     this.isExpandRows = true,
     this.expanded,
     this.dropContainer,
+    this.onChangedRow,
+    this.onSubmittedRow,
     this.reponseScreenSizes = const [
-      ScreenSize.Xs,
-      ScreenSize.Sm,
-      ScreenSize.Md
+      ScreenSize.xs,
+      ScreenSize.sm,
+      ScreenSize.md
     ],
   }) : super(key: key);
 
@@ -64,12 +70,13 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Checkbox(
-            value: widget.selecteds!.length == widget.source!.length &&
-                widget.source != null &&
-                widget.source!.isNotEmpty,
-            onChanged: (value) {
-              if (widget.onSelectAll != null) widget.onSelectAll!(value);
-            }),
+          value: widget.selecteds!.length == widget.source!.length &&
+              widget.source != null &&
+              widget.source!.isNotEmpty,
+          onChanged: (value) {
+            if (widget.onSelectAll != null) widget.onSelectAll!(value);
+          },
+        ),
         PopupMenuButton(
             child: Container(
               padding: const EdgeInsets.all(15),
@@ -86,7 +93,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Text(
-                            "${header.text}",
+                            header.text,
                             textAlign: header.textAlign,
                           ),
                           if (widget.sortColumn != null &&
@@ -135,7 +142,8 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                         }),
                 ],
               ),
-              if (widget.commonMobileView) widget.dropContainer!(data),
+              if (widget.commonMobileView && widget.dropContainer != null)
+                widget.dropContainer!(data),
               if (!widget.commonMobileView)
                 ...widget.headers!
                     .where((header) => header.show == true)
@@ -149,7 +157,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                             header.headerBuilder != null
                                 ? header.headerBuilder!(header.value)
                                 : Text(
-                                    "${header.text}",
+                                    header.text,
                                     overflow: TextOverflow.clip,
                                   ),
                             const Spacer(),
@@ -157,10 +165,13 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                                 ? header.sourceBuilder!(
                                     data[header.value], data)
                                 : header.editable
-                                    ? editAbleWidget(
+                                    ? TextEditableWidget(
                                         data: data,
                                         header: header,
                                         textAlign: TextAlign.end,
+                                        onChanged: widget.onChangedRow,
+                                        onSubmitted: widget.onSubmittedRow,
+                                        hideUnderline: widget.hideUnderline,
                                       )
                                     : Text("${data[header.value]}")
                           ],
@@ -175,7 +186,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
     }).toList();
   }
 
-  Alignment headerAlignSwitch(TextAlign? textAlign) {
+  static Alignment headerAlignSwitch(TextAlign? textAlign) {
     switch (textAlign) {
       case TextAlign.center:
         return Alignment.center;
@@ -208,10 +219,10 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
               .where((header) => header.show == true)
               .map(
                 (header) => Expanded(
-                    flex: header.flex ?? 1,
+                    flex: header.flex,
                     child: InkWell(
                       onTap: () {
-                        if (widget.onSort != null && header.sortable!) {
+                        if (widget.onSort != null && header.sortable) {
                           widget.onSort!(header.value);
                         }
                       },
@@ -290,14 +301,17 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                       .where((header) => header.show == true)
                       .map(
                         (header) => Expanded(
-                          flex: header.flex ?? 1,
+                          flex: header.flex,
                           child: header.sourceBuilder != null
                               ? header.sourceBuilder!(data[header.value], data)
                               : header.editable
-                                  ? editAbleWidget(
+                                  ? TextEditableWidget(
                                       data: data,
                                       header: header,
-                                      textAlign: header.textAlign!,
+                                      textAlign: header.textAlign,
+                                      onChanged: widget.onChangedRow,
+                                      onSubmitted: widget.onSubmittedRow,
+                                      hideUnderline: widget.hideUnderline,
                                     )
                                   : Text(
                                       "${data[header.value]}",
@@ -310,7 +324,9 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
               ),
             ),
           ),
-          if (widget.isExpandRows && widget.expanded![index])
+          if (widget.isExpandRows &&
+              widget.expanded![index] &&
+              widget.dropContainer != null)
             widget.dropContainer!(data)
         ],
       ));
@@ -318,31 +334,33 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
     return widgets;
   }
 
-  Widget editAbleWidget({
-    required Map<String?, dynamic> data,
-    required DatatableHeader header,
-    TextAlign textAlign = TextAlign.center,
-  }) {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 150),
-      padding: const EdgeInsets.all(0),
-      margin: const EdgeInsets.all(0),
-      child: TextField(
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.all(0),
-          border: this.widget.hideUnderline
-              ? InputBorder.none
-              : const UnderlineInputBorder(borderSide: BorderSide(width: 1)),
-          alignLabelWithHint: true,
-        ),
-        textAlign: textAlign,
-        controller: TextEditingController.fromValue(
-          TextEditingValue(text: "${data[header.value]}"),
-        ),
-        onChanged: (newValue) => data[header.value] = newValue,
-      ),
-    );
-  }
+  /// `split to TextEditableWidget`
+  ///
+  /// Widget editAbleWidget({
+  ///   required Map<String, dynamic> data,
+  ///   required DatatableHeader header,
+  ///   TextAlign textAlign = TextAlign.center,
+  /// }) {
+  ///   return Container(
+  ///     constraints: const BoxConstraints(maxWidth: 150),
+  ///     padding: const EdgeInsets.all(0),
+  ///     margin: const EdgeInsets.all(0),
+  ///     child: TextField(
+  ///       decoration: InputDecoration(
+  ///         contentPadding: const EdgeInsets.all(0),
+  ///         border: this.widget.hideUnderline
+  ///             ? InputBorder.none
+  ///             : const UnderlineInputBorder(borderSide: BorderSide(width: 1)),
+  ///         alignLabelWithHint: true,
+  ///       ),
+  ///       textAlign: textAlign,
+  ///       controller: TextEditingController.fromValue(
+  ///         TextEditingValue(text: "${data[header.value]}"),
+  ///       ),
+  ///       onChanged: (newValue) => data[header.value] = newValue,
+  ///     ),
+  ///   );
+  /// }
 
   @override
   Widget build(BuildContext context) {
@@ -444,5 +462,78 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                 )
             ],
           );
+  }
+}
+
+/// `TextEditableWidget`
+///
+/// use to display when user allow any header columns to be editable
+class TextEditableWidget extends StatelessWidget {
+  /// `data`
+  ///
+  /// current data as Map
+  final Map<String, dynamic> data;
+
+  /// `header`
+  ///
+  /// current editable text header
+  final DatatableHeader header;
+
+  /// `textAlign`
+  ///
+  /// by default textAlign will be center
+  final TextAlign textAlign;
+
+  /// `hideUnderline`
+  ///
+  /// allow use to decorate hideUnderline false or true
+  final bool hideUnderline;
+
+  /// `onChanged`
+  ///
+  /// trigger the call back update when user make any text change
+  final Function(Map<String, dynamic> vaue, DatatableHeader header)? onChanged;
+
+  /// `onSubmitted`
+  ///
+  /// trigger the call back when user press done or enter
+  final Function(Map<String, dynamic> vaue, DatatableHeader header)?
+      onSubmitted;
+
+  const TextEditableWidget({
+    Key? key,
+    required this.data,
+    required this.header,
+    this.textAlign = TextAlign.center,
+    this.hideUnderline = false,
+    this.onChanged,
+    this.onSubmitted,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 150),
+      padding: const EdgeInsets.all(0),
+      margin: const EdgeInsets.all(0),
+      child: TextField(
+        decoration: InputDecoration(
+          contentPadding: const EdgeInsets.all(0),
+          border: hideUnderline
+              ? InputBorder.none
+              : const UnderlineInputBorder(borderSide: BorderSide(width: 1)),
+          alignLabelWithHint: true,
+        ),
+        textAlign: textAlign,
+        controller: TextEditingController.fromValue(
+          TextEditingValue(text: "${data[header.value]}"),
+        ),
+        onChanged: (newValue) {
+          data[header.value] = newValue;
+          onChanged?.call(data, header);
+        },
+        onSubmitted: (x) => onSubmitted?.call(data, header),
+      ),
+    );
   }
 }

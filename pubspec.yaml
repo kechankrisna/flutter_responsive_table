@@ -4,8 +4,8 @@ version: 0.2.0
 homepage: https://github.com/kechankrisna/flutter_responsive_table
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
-  flutter: ">=1.10.0"
+  sdk: ">=2.15.1 <3.0.0"
+  flutter: ">=1.17.0"
 
 dependencies:
   flutter:
@@ -25,17 +25,6 @@ flutter:
   # The 'pluginClass' and Android 'package' identifiers should not ordinarily
   # be modified. They are used by the tooling to maintain consistency when
   # adding or updating assets for this project.
-  plugin:
-    platforms:
-      android:
-        package: app.mylekha.plugins.responsive_table
-        pluginClass: ResponsiveTablePlugin
-      ios:
-        pluginClass: ResponsiveTablePlugin
-      linux:
-        pluginClass: ResponsiveTablePlugin
-      macos:
-        pluginClass: ResponsiveTablePlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

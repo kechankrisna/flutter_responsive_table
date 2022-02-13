@@ -1,5 +1,3 @@
-// ignore_for_file: constant_identifier_names
-
 import 'dart:io' as io;
 import 'package:flutter/material.dart';
 
@@ -47,64 +45,64 @@ extension BuildContextParsing on BuildContext {
   DeviceType get deviceType {
     final double width = this.deviceWidth;
     if (width > 0 && width < kXsBreakPoint) {
-      return DeviceType.Smartphone;
+      return DeviceType.smartphone;
     } else if (width >= kXsBreakPoint && width < kSmBreakPoint) {
-      return DeviceType.MiniTablet;
+      return DeviceType.miniTablet;
     } else if (width >= kSmBreakPoint && width < kMdBreakPoint) {
-      return DeviceType.Tablet;
+      return DeviceType.tablet;
     } else if (width >= kMdBreakPoint) {
-      return DeviceType.Desktop;
+      return DeviceType.desktop;
     } else {
-      return DeviceType.Unknown;
+      return DeviceType.unknown;
     }
   }
 
   DeviceSize get deviceSize {
     final double width = this.deviceWidth;
     if (width < kXsBreakPoint) {
-      return DeviceSize.Xs;
+      return DeviceSize.xs;
     } else if (kXsBreakPoint <= width && width < kSmBreakPoint) {
-      return DeviceSize.Sm;
+      return DeviceSize.sm;
     } else if (kSmBreakPoint <= width && width < kMdBreakPoint) {
-      return DeviceSize.Md;
+      return DeviceSize.md;
     } else if (kMdBreakPoint <= width && width < kLgBreakPoint) {
-      return DeviceSize.Lg;
+      return DeviceSize.lg;
     } else {
-      return DeviceSize.Xl;
+      return DeviceSize.xl;
     }
   }
 
   ScreenSize get screenSize {
     final double width = this.screenWidth;
     if (width < kXsBreakPoint) {
-      return ScreenSize.Xs;
+      return ScreenSize.xs;
     } else if (kXsBreakPoint <= width && width < kSmBreakPoint) {
-      return ScreenSize.Sm;
+      return ScreenSize.sm;
     } else if (kSmBreakPoint <= width && width < kMdBreakPoint) {
-      return ScreenSize.Md;
+      return ScreenSize.md;
     } else if (kMdBreakPoint <= width && width < kLgBreakPoint) {
-      return ScreenSize.Lg;
+      return ScreenSize.lg;
     } else {
-      return ScreenSize.Xl;
+      return ScreenSize.xl;
     }
   }
 
   double get defaultContainerRatio {
     double ratio = 1;
     switch (screenSize) {
-      case ScreenSize.Xs:
+      case ScreenSize.xs:
         ratio = 1.45;
         break;
-      case ScreenSize.Sm:
+      case ScreenSize.sm:
         ratio = 1.75;
         break;
-      case ScreenSize.Md:
+      case ScreenSize.md:
         ratio = 2;
         break;
-      case ScreenSize.Lg:
+      case ScreenSize.lg:
         ratio = 2.5;
         break;
-      case ScreenSize.Xl:
+      case ScreenSize.xl:
         ratio = 2.5;
         break;
       default:
@@ -114,7 +112,7 @@ extension BuildContextParsing on BuildContext {
   }
 
   double get defaultContainerPadding {
-    if (deviceSize == DeviceSize.Xs) {
+    if (deviceSize == DeviceSize.xs) {
       return 0;
     }
     return 10;
@@ -126,9 +124,9 @@ extension BuildContextParsing on BuildContext {
   }
 
   double get autoDrawerEdgeDragWidth {
-    if (this.screenSize == ScreenSize.Xl ||
-        this.screenSize == ScreenSize.Lg ||
-        this.screenSize == ScreenSize.Md) {
+    if (this.screenSize == ScreenSize.xl ||
+        this.screenSize == ScreenSize.lg ||
+        this.screenSize == ScreenSize.md) {
       return 0;
     }
     return double.infinity;
@@ -136,13 +134,13 @@ extension BuildContextParsing on BuildContext {
 }
 
 // refer to the type of device
-enum DeviceType { Smartphone, MiniTablet, Tablet, Desktop, Unknown }
+enum DeviceType { smartphone, miniTablet, tablet, desktop, unknown }
 // refer to the device width
-enum DeviceSize { Xs, Sm, Md, Lg, Xl }
+enum DeviceSize { xs, sm, md, lg, xl }
 // refer to the screen width
-enum ScreenSize { Xs, Sm, Md, Lg, Xl }
+enum ScreenSize { xs, sm, md, lg, xl }
 //refer to the box width
-enum BoxSize { Xs, Sm, Md, Lg, Xl }
+enum BoxSize { xs, sm, md, lg, xl }
 /* Extra small devices (phones, 600px and down) */
 // @media only screen and (max-width: 600px) {...}
 
