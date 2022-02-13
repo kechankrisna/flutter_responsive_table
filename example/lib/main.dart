@@ -24,18 +24,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class DataPickerPage extends StatefulWidget {
-  @override
-  _DataPickerPageState createState() => _DataPickerPageState();
-}
-
-class _DataPickerPageState extends State<DataPickerPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
-
 class DataPage extends StatefulWidget {
   DataPage({Key? key}) : super(key: key);
   @override
@@ -238,15 +226,23 @@ class _DataPageState extends State<DataPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("RESPONSIVE DATA TABLE"),
-        actions: [
-          IconButton(
-              icon: Icon(Icons.refresh),
-              onPressed: () {
-                _initializeData();
-              })
-        ],
       ),
-
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            ListTile(
+              leading: Icon(Icons.home),
+              title: Text("home"),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: Icon(Icons.storage),
+              title: Text("data"),
+              onTap: () {},
+            )
+          ],
+        ),
+      ),
       body: SingleChildScrollView(
           child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -263,7 +259,11 @@ class _DataPageState extends State<DataPage> {
                 shadowColor: Colors.black,
                 clipBehavior: Clip.none,
                 child: ResponsiveDatatable(
-                  title: null,
+                  title: TextButton.icon(
+                    onPressed: () => {},
+                    icon: Icon(Icons.add),
+                    label: Text("new item"),
+                  ),
                   reponseScreenSizes: [ScreenSize.xs],
                   actions: [
                     if (_isSearch)
@@ -280,6 +280,7 @@ class _DataPageState extends State<DataPage> {
                                   setState(() {
                                     _isSearch = false;
                                   });
+                                  _initializeData();
                                 }),
                             suffixIcon: IconButton(
                                 icon: Icon(Icons.search), onPressed: () {})),
@@ -369,21 +370,23 @@ class _DataPageState extends State<DataPage> {
                     if (_perPages.isNotEmpty)
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 15),
-                        child: DropdownButton(
-                            value: _currentPerPage,
-                            items: _perPages
-                                .map((e) => DropdownMenuItem(
-                                      child: Text("$e"),
-                                      value: e,
-                                    ))
-                                .toList(),
-                            onChanged: (dynamic value) {
-                              setState(() {
-                                _currentPerPage = value;
-                                _currentPage = 1;
-                                _resetData();
-                              });
-                            }),
+                        child: DropdownButton<int>(
+                          value: _currentPerPage,
+                          items: _perPages
+                              .map((e) => DropdownMenuItem<int>(
+                                    child: Text("$e"),
+                                    value: e,
+                                  ))
+                              .toList(),
+                          onChanged: (dynamic value) {
+                            setState(() {
+                              _currentPerPage = value;
+                              _currentPage = 1;
+                              _resetData();
+                            });
+                          },
+                          isExpanded: false,
+                        ),
                       ),
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 15),
@@ -427,12 +430,10 @@ class _DataPageState extends State<DataPage> {
               ),
             ),
           ])),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     _initData();
-      //   },
-      //   child: Icon(Icons.add),
-      // ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _initializeData,
+        child: Icon(Icons.refresh_sharp),
+      ),
     );
   }
 }
