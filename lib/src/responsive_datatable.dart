@@ -4,7 +4,7 @@ import 'datatable_header.dart';
 
 class ResponsiveDatatable extends StatefulWidget {
   final bool showSelect;
-  final List<DatatableHeader>? headers;
+  final List<DatatableHeader> headers;
   final List<Map<String, dynamic>>? source;
   final List<Map<String, dynamic>>? selecteds;
   final Widget? title;
@@ -36,7 +36,7 @@ class ResponsiveDatatable extends StatefulWidget {
     this.onSelect,
     this.onTabRow,
     this.onSort,
-    this.headers,
+    this.headers = const [],
     this.source,
     this.selecteds,
     this.title,
@@ -84,7 +84,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
             ),
             tooltip: "SORT BY",
             initialValue: widget.sortColumn,
-            itemBuilder: (_) => widget.headers!
+            itemBuilder: (_) => widget.headers
                 .where(
                     (header) => header.show == true && header.sortable == true)
                 .toList()
@@ -116,11 +116,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
   List<Widget> mobileList() {
     return widget.source!.map((data) {
       return InkWell(
-        onTap: widget.onTabRow != null
-            ? () {
-                widget.onTabRow!(data);
-              }
-            : null,
+        onTap: () => widget.onTabRow?.call(data),
         child: Container(
           decoration: BoxDecoration(
               border: Border(
@@ -145,7 +141,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
               if (widget.commonMobileView && widget.dropContainer != null)
                 widget.dropContainer!(data),
               if (!widget.commonMobileView)
-                ...widget.headers!
+                ...widget.headers
                     .where((header) => header.show == true)
                     .toList()
                     .map(
@@ -215,7 +211,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                 onChanged: (value) {
                   if (widget.onSelectAll != null) widget.onSelectAll!(value);
                 }),
-          ...widget.headers!
+          ...widget.headers
               .where((header) => header.show == true)
               .map(
                 (header) => Expanded(
@@ -235,7 +231,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                                 crossAxisAlignment: WrapCrossAlignment.center,
                                 children: [
                                   Text(
-                                    "${header.text}",
+                                    header.text,
                                     textAlign: header.textAlign,
                                   ),
                                   if (widget.sortColumn != null &&
@@ -264,9 +260,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
         children: [
           InkWell(
             onTap: () {
-              if (widget.onTabRow != null) {
-                widget.onTabRow!(data);
-              }
+              widget.onTabRow?.call(data);
               setState(() {
                 widget.expanded![index] = !widget.expanded![index];
               });
@@ -291,7 +285,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                             }),
                       ],
                     ),
-                  ...widget.headers!
+                  ...widget.headers
                       .where((header) => header.show == true)
                       .map(
                         (header) => Expanded(
@@ -328,46 +322,17 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
     return widgets;
   }
 
-  /// `split to TextEditableWidget`
-  ///
-  /// Widget editAbleWidget({
-  ///   required Map<String, dynamic> data,
-  ///   required DatatableHeader header,
-  ///   TextAlign textAlign = TextAlign.center,
-  /// }) {
-  ///   return Container(
-  ///     constraints: const BoxConstraints(maxWidth: 150),
-  ///     padding: const EdgeInsets.all(0),
-  ///     margin: const EdgeInsets.all(0),
-  ///     child: TextField(
-  ///       decoration: InputDecoration(
-  ///         contentPadding: const EdgeInsets.all(0),
-  ///         border: this.widget.hideUnderline
-  ///             ? InputBorder.none
-  ///             : const UnderlineInputBorder(borderSide: BorderSide(width: 1)),
-  ///         alignLabelWithHint: true,
-  ///       ),
-  ///       textAlign: textAlign,
-  ///       controller: TextEditingController.fromValue(
-  ///         TextEditingValue(text: "${data[header.value]}"),
-  ///       ),
-  ///       onChanged: (newValue) => data[header.value] = newValue,
-  ///     ),
-  ///   );
-  /// }
-
   @override
   Widget build(BuildContext context) {
     return widget.reponseScreenSizes.isNotEmpty &&
             widget.reponseScreenSizes.contains(context.screenSize)
         ?
-        /**
-         * for small screen
-         */
+
+        /// for small screen
         Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              //title and actions
+              /// title and actions
               if (widget.title != null || widget.actions != null)
                 Container(
                   padding: const EdgeInsets.all(5),
@@ -389,24 +354,25 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                     if (widget.showSelect && widget.selecteds != null)
                       mobileHeader(),
                     if (widget.isLoading) const LinearProgressIndicator(),
-                    //mobileList
                     ...mobileList(),
                   ],
                 ),
               if (!widget.autoHeight)
                 Expanded(
                   child: ListView(
-                    // itemCount: source.length,
+                    /// itemCount: source.length,
                     children: [
                       if (widget.showSelect && widget.selecteds != null)
                         mobileHeader(),
                       if (widget.isLoading) const LinearProgressIndicator(),
-                      //mobileList
+
+                      /// mobileList
                       ...mobileList(),
                     ],
                   ),
                 ),
-              //footer
+
+              /// footer
               if (widget.footers != null)
                 Wrap(
                   crossAxisAlignment: WrapCrossAlignment.center,
@@ -435,9 +401,8 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                   ),
                 ),
 
-              //desktopHeader
-              if (widget.headers != null && widget.headers!.isNotEmpty)
-                desktopHeader(),
+              /// desktopHeader
+              if (widget.headers.isNotEmpty) desktopHeader(),
 
               if (widget.isLoading) const LinearProgressIndicator(),
 

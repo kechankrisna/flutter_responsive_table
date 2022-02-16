@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -226,6 +227,12 @@ class _DataPageState extends State<DataPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("RESPONSIVE DATA TABLE"),
+        actions: [
+          IconButton(
+            onPressed: _initializeData,
+            icon: Icon(Icons.refresh_sharp),
+          ),
+        ],
       ),
       drawer: Drawer(
         child: ListView(
@@ -430,10 +437,6 @@ class _DataPageState extends State<DataPage> {
               ),
             ),
           ])),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _initializeData,
-        child: Icon(Icons.refresh_sharp),
-      ),
     );
   }
 }
@@ -464,7 +467,6 @@ class _DropDownContainer extends StatelessWidget {
         ///     color: Colors.red,
         ///     height: 50,
         ///   )),
-
         /// ],
         children: _children,
       ),
