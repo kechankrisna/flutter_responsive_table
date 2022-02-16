@@ -1,5 +1,5 @@
+import 'package:adaptivex/adaptivex.dart';
 import 'package:flutter/material.dart';
-import 'widget_parsing.dart';
 import 'datatable_header.dart';
 
 class ResponsiveDatatable extends StatefulWidget {
@@ -289,12 +289,6 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                                 widget.onSelect!(value, data);
                               }
                             }),
-                        // RaisedButton(onPressed: (){
-                        //   setState(() {
-                        //     widget.expanded[widget.selecteds.indexOf(data)] = true;
-                        //   });
-                        // },
-                        // child: Text("Drop"),)
                       ],
                     ),
                   ...widget.headers!
