@@ -8,6 +8,10 @@ Responsive Data table is a highly flexible tool built upon the foundations of pr
 
 ![screenshot2](https://raw.githubusercontent.com/kechankrisna/flutter_responsive_table/master/screenshot/screenshot2.png)
 
+![screenshot3](https://raw.githubusercontent.com/kechankrisna/flutter_responsive_table/master/screenshot/screenshot3.png)
+
+![screenshot4](https://raw.githubusercontent.com/kechankrisna/flutter_responsive_table/master/screenshot/screenshot4.png)
+
 ```dart
 import 'dart:math';
 import 'package:flutter/material.dart';
