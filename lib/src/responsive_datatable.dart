@@ -27,6 +27,9 @@ class ResponsiveDatatable extends StatefulWidget {
       onChangedRow;
   final Function(Map<String, dynamic> value, DatatableHeader header)?
       onSubmittedRow;
+  /// `reponseScreenSizes`
+  /// 
+  /// the ScreenSize that will responsive as list view 
   final List<ScreenSize> reponseScreenSizes;
 
   /// `headerDecoration`
