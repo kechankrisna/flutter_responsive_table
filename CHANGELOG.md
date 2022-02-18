@@ -1,3 +1,12 @@
+# 0.2.0+2
+
+* `headerDecoration`: decorate the data row
+* `rowDecoration`: decorate the data row
+* `selectedDecoration`: decorate the selected data row
+* `headerTextStyle`: styling the header row
+* `rowTextStyle`: styling the data row
+* `selectedTextStyle`: styling the selected data row
+
 # 0.2.0+1
 
 * update example and split TextEditableWidget

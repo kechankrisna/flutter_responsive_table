@@ -433,6 +433,19 @@ class _DataPageState extends State<DataPage> {
                       padding: EdgeInsets.symmetric(horizontal: 15),
                     )
                   ],
+                  headerDecoration: BoxDecoration(
+                      color: Colors.grey,
+                      border: Border(
+                          bottom: BorderSide(color: Colors.red, width: 1))),
+                  selectedDecoration: BoxDecoration(
+                    border: Border(
+                        bottom:
+                            BorderSide(color: Colors.green[300]!, width: 1)),
+                    color: Colors.green,
+                  ),
+                  headerTextStyle: TextStyle(color: Colors.white),
+                  rowTextStyle: TextStyle(color: Colors.green),
+                  selectedTextStyle: TextStyle(color: Colors.white),
                 ),
               ),
             ),

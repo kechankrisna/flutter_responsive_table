@@ -29,6 +29,36 @@ class ResponsiveDatatable extends StatefulWidget {
       onSubmittedRow;
   final List<ScreenSize> reponseScreenSizes;
 
+  /// `headerDecoration`
+  ///
+  /// allow to decorate the header row
+  final BoxDecoration? headerDecoration;
+
+  /// `rowDecoration`
+  ///
+  /// allow to decorate the data row
+  final BoxDecoration? rowDecoration;
+
+  /// `selectedDecoration`
+  ///
+  /// allow to decorate the selected data row
+  final BoxDecoration? selectedDecoration;
+
+  /// `selectedTextStyle`
+  ///
+  /// allow to styling the header row
+  final TextStyle? headerTextStyle;
+
+  /// `selectedTextStyle`
+  ///
+  /// allow to styling the data row
+  final TextStyle? rowTextStyle;
+
+  /// `selectedTextStyle`
+  ///
+  /// allow to styling the selected data row
+  final TextStyle? selectedTextStyle;
+
   const ResponsiveDatatable({
     Key? key,
     this.showSelect = false,
@@ -58,6 +88,12 @@ class ResponsiveDatatable extends StatefulWidget {
       ScreenSize.sm,
       ScreenSize.md
     ],
+    this.headerDecoration,
+    this.rowDecoration,
+    this.selectedDecoration,
+    this.headerTextStyle,
+    this.rowTextStyle,
+    this.selectedTextStyle,
   }) : super(key: key);
 
   @override
@@ -114,13 +150,18 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
   }
 
   List<Widget> mobileList() {
+    final _decoration = BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.grey[300]!, width: 1)));
+    final _rowDecoration = widget.rowDecoration ?? _decoration;
+    final _selectedDecoration = widget.selectedDecoration ?? _decoration;
     return widget.source!.map((data) {
       return InkWell(
         onTap: () => widget.onTabRow?.call(data),
         child: Container(
-          decoration: BoxDecoration(
-              border: Border(
-                  bottom: BorderSide(color: Colors.grey[300]!, width: 1))),
+          /// TODO:
+          decoration: widget.selecteds!.contains(data)
+              ? _selectedDecoration
+              : _rowDecoration,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -155,6 +196,9 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                                 : Text(
                                     header.text,
                                     overflow: TextOverflow.clip,
+                                    style: widget.selecteds!.contains(data)
+                                        ? widget.selectedTextStyle
+                                        : widget.rowTextStyle,
                                   ),
                             const Spacer(),
                             header.sourceBuilder != null
@@ -169,7 +213,12 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                                         onSubmitted: widget.onSubmittedRow,
                                         hideUnderline: widget.hideUnderline,
                                       )
-                                    : Text("${data[header.value]}")
+                                    : Text(
+                                        "${data[header.value]}",
+                                        style: widget.selecteds!.contains(data)
+                                            ? widget.selectedTextStyle
+                                            : widget.rowTextStyle,
+                                      )
                           ],
                         ),
                       ),
@@ -196,10 +245,13 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
   }
 
   Widget desktopHeader() {
+    final _headerDecoration = widget.headerDecoration ??
+        BoxDecoration(
+            border:
+                Border(bottom: BorderSide(color: Colors.grey[300]!, width: 1)));
     return Container(
-      decoration: BoxDecoration(
-          border:
-              Border(bottom: BorderSide(color: Colors.grey[300]!, width: 1))),
+      /// TODO:
+      decoration: _headerDecoration,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -233,6 +285,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                                   Text(
                                     header.text,
                                     textAlign: header.textAlign,
+                                    style: widget.headerTextStyle,
                                   ),
                                   if (widget.sortColumn != null &&
                                       widget.sortColumn == header.value)
@@ -253,6 +306,10 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
   }
 
   List<Widget> desktopList() {
+    final _decoration = BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.grey[300]!, width: 1)));
+    final _rowDecoration = widget.rowDecoration ?? _decoration;
+    final _selectedDecoration = widget.selectedDecoration ?? _decoration;
     List<Widget> widgets = [];
     for (var index = 0; index < widget.source!.length; index++) {
       final data = widget.source![index];
@@ -267,9 +324,11 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
             },
             child: Container(
               padding: EdgeInsets.all(widget.showSelect ? 0 : 11),
-              decoration: BoxDecoration(
-                  border: Border(
-                      bottom: BorderSide(color: Colors.grey[300]!, width: 1))),
+
+              /// TODO:
+              decoration: widget.selecteds!.contains(data)
+                  ? _selectedDecoration
+                  : _rowDecoration,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -304,6 +363,9 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
                                   : Text(
                                       "${data[header.value]}",
                                       textAlign: header.textAlign,
+                                      style: widget.selecteds!.contains(data)
+                                          ? widget.selectedTextStyle
+                                          : widget.rowTextStyle,
                                     ),
                         ),
                       )
