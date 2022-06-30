@@ -9,6 +9,8 @@ environment:
 
 dependencies:
   adaptivex: ^0.0.1+2
+  printing: ^5.9.1
+  pdf: ^3.8.1
   flutter:
     sdk: flutter  
 

@@ -272,6 +272,7 @@ class _DataPageState extends State<DataPage> {
                     label: Text("new item"),
                   ),
                   reponseScreenSizes: [ScreenSize.xs],
+                  exports: [ExportAction.print],
                   actions: [
                     if (_isSearch)
                       Expanded(
