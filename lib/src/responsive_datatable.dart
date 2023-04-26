@@ -379,6 +379,7 @@ class _ResponsiveDatatableState extends State<ResponsiveDatatable> {
             ),
           ),
           if (widget.isExpandRows &&
+              widget.expanded != null &&
               widget.expanded![index] &&
               widget.dropContainer != null)
             widget.dropContainer!(data)
